@@ -24,6 +24,10 @@ dns具体讲讲
 
 ![1594896231675](C:\Users\ADMINI~1\AppData\Local\Temp\1594896231675.png)
 
+字节9面（微服务）
+
+<https://www.nowcoder.com/discuss/453852?type=post&order=time&pos=&page=3&channel=1010&source_id=search_post>
+
 ## 算法
 
 #### 排序算法
@@ -178,9 +182,7 @@ select n , sc from (select avg(score) as sc,name as n from tb group by n having 
 
 ### 指令 
 
-grep
-
-linux系统中，利用grep打印匹配的上下几行
+#### 利用grep打印匹配的上下几行
 
 如果在只是想匹配模式的上下几行，grep可以实现。
 
@@ -215,13 +217,21 @@ tail -100 /data/logs/php/php_error_5.3.log  | grep  "Memcache::get()";
 
 这样你就可以只查看文件的第5行到第10行。
 
+### 查看端口是否被占用
 
+netstat -anp | grep 端口号
+
+## 操作系统
+
+虚拟内存和物理内存的映射关系和工作原理：
+
+<https://blog.csdn.net/don_chiang709/article/details/89087709>
 
 ## 计算机网络
 
 ### HTTPS
 
-#### 优缺点
+**优缺点**
 
 优点：
 
@@ -241,15 +251,15 @@ SSL证书需要绑定IP，不能在同一个ip绑定多个域名，ipv4资源支
 
 --------------------------------------------
 
-#### 加密机制
+**加密机制**
 
 采用混合加密机制。在交换密钥环节使用公开密钥加密方式，之后的建立通信交换报文阶段则使用共享密钥加密。HTTPS 在内容传输的加密上使用的是对称加密，非对称加密只作用在证书验证阶段。
 
-#### 证书
+**证书**
 
 遗憾的是，仅凭借公开密钥加密的方式是不够的，因为无法证明公钥本身是真实的公钥，存在被伪造的隐患。为解决上述问题，使用数字证书机构CA 颁发的公钥证书，CA处于客户端和服务端都可以信赖的第三方机构的立场上。
 
-#### 通信过程
+**通信过程**
 
 客户使用https的URL访问Web服务器，要求与Web服务器建立SSL连接。
 
@@ -263,8 +273,50 @@ Web服务器利用自己的私钥解密出会话密钥。
 
 Web服务器利用会话密钥加密与客户端之间的通信。
 
-
-
 参考：
 
 <https://blog.csdn.net/weixin_46124214/article/details/105875458>
+
+### 网络协议分层
+
+**OSI七层模型**
+
+OSI中的层            功能                                                        TCP/IP协议族 
+应用层                 文件传输，电子邮件，文件服务，虚拟终端         TFTP，HTTP，SNMP，FTP，SMTP，DNS，Telnet 
+表示层                 数据格式化，代码转换，数据加密                                    没有协议 
+会话 层                 解除或建立与别的接点的联系                                          没有协议 
+传输层                 提供端对端的接口                                                        TCP，UDP （RTP）
+网 络层                 为数据包选择路由                                                        IP，ICMP，RIP，OSPF，BGP，IGMP 
+数据链路层           传输有地址的帧以及错误检测功能                            SLIP，CSLIP，PPP，ARP，RARP，MTU 
+物 理层                 以二进制数据形式在物理媒体上传输数据                             ISO2110，IEEE802，IEEE802.2
+
+**TCP/IP五层模型的协议**
+
+应用层 
+传输层：四层交换机、也有工作在四层的路由器
+
+网络层：路由器、三层交换机
+
+数据链路层：网桥（现已很少使用）、以太网交换机（二层交换机）、网卡（其实网卡是一半工作在物理层、一半工作在数据链路层）
+
+物理层：中继器、集线器、还有我们通常说的双绞线也工作在物理层
+
+### ICMP
+
+
+
+## 中间件
+
+### Zookeeper
+
+zookeeper角色和投票机制：
+
+<https://www.cnblogs.com/wlwl/p/10715065.html>
+
+为什么不推荐zookeeper做注册中心？阿里技术文章
+
+<http://jm.taobao.org/2018/06/13/%E5%81%9A%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0%EF%BC%9F/>
+
+zookeeper角色：observer处理读请求，没有投票和选举权。follower处理读请求，leader会根据算法落实到某个follower节点。leader一个集群只有一个，处理写请求，负责发起投票和决议，更新系统状态。每次写请求都会发起投票，只有过半的节点通过才能写入数据。
+
+zookeeper客户端与服务端建立连接会创建session，通过心跳机制来确定session是否过期，如果过期，该客户端的临时节点都会失效。
