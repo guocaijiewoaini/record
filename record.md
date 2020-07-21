@@ -60,6 +60,94 @@ public void quicksort(int[] nums ,int start, int end){
 
 ```
 
+#### leetcode
+
+##### leetcode 46 全排列
+
+全排列用dfs回溯求解。
+
+```java
+class Solution {
+    List<List<Integer>> rslist =new ArrayList<>();
+    List<Integer> list =new ArrayList<>();
+    int n;
+    int[] used;
+    public List<List<Integer>> permute(int[] nums) {
+        n=nums.length;
+        used=new int[n];
+        dfs(nums,0);
+        return rslist;
+    }
+    public void dfs(int[] nums,int cur){
+        if(cur==n){
+            rslist.add(new ArrayList<>(list));
+            return;
+        }
+        for(int i=0;i<n;i++){
+            if(used[i]==0){
+                used[i]=1;
+                list.add(nums[i]);
+                dfs(nums,cur+1);
+                used[i]=0;
+                list.remove(list.size()-1);
+            }
+        }
+    }
+}
+```
+
+##### leetcode 47 全排列
+
+这个题比上面46多了一个不可重复，在回溯的基础上要进行剪枝。
+
+参考题解：<https://leetcode-cn.com/problems/permutations-ii/solution/hui-su-suan-fa-python-dai-ma-java-dai-ma-by-liwe-2/>
+
+建议把ArrayList换成ArrayDeque，其实使用Stack就行，Java官方Stack类的建议是ArrayDeque。
+
+```java
+class Solution {
+
+    public List<List<Integer>> permuteUnique(int[] nums) {
+        int n =nums.length;
+        int[] used =new int[n];
+        List<List<Integer>> rslist =new ArrayList<>();
+        List<Integer> list =new ArrayList<>();
+        Arrays.sort(nums);//排序是剪枝的前提
+        return dfs(nums,n,used,0,rslist,list);
+    }
+    public List<List<Integer>> dfs(int[] nums,int n,int[] used,int cur,List<List<Integer>> rslist,List<Integer> list){
+        if(cur==n){
+            rslist.add(new ArrayList<>(list));
+            return rslist;
+        }
+        for(int i=0;i<n;i++){
+            if(used[i]==1){
+                continue;
+            }
+            if(i>0&&nums[i]==nums[i-1]&&used[i-1]==0){
+                continue;
+            }
+            used[i]=1;
+            list.add(nums[i]);
+            dfs(nums,n,used,cur+1,rslist,list);
+            used[i]=0;
+            list.remove(list.size()-1);
+        }
+        return rslist;
+    }
+}
+```
+
+
+
+#### 剑指Offer
+
+#### [剑指 Offer 38. 字符串的排列](https://leetcode-cn.com/problems/zi-fu-chuan-de-pai-lie-lcof/)
+
+## Java基础
+
+#### 线程池
+
 1. newSingleThreadExecutorl()
 
    只有一个线程，适合于任务顺序执行的场景，阻塞队列是LinkedBlockingQueue  无界队列
@@ -86,17 +174,8 @@ public void quicksort(int[] nums ,int start, int end){
 
 
 
-cap consistency一致性，availablity可用性，分区容错性partion tolerance
 
 
-
-进程通信：
-
-1. 信号
-
-   进程通过信号进行通信，用于用纸接受进程的某个事件已经发生。如kill -9 pid 就是向pid进程发起结束进程的信号
-
-2. 管道。有名管道和匿名管道。匿名管道用于 父子进程的通信，而有名管道用于 无亲缘关系的进程通信，
 
 
 
@@ -227,6 +306,14 @@ netstat -anp | grep 端口号
 
 <https://blog.csdn.net/don_chiang709/article/details/89087709>
 
+#### 进程通信：
+
+1. 信号
+
+   进程通过信号进行通信，用于用纸接受进程的某个事件已经发生。如kill -9 pid 就是向pid进程发起结束进程的信号
+
+2. 管道。有名管道和匿名管道。匿名管道用于 父子进程的通信，而有名管道用于 无亲缘关系的进程通信，
+
 ## 计算机网络
 
 ### HTTPS
@@ -308,6 +395,10 @@ OSI中的层            功能                                                  
 ## 中间件
 
 ### Zookeeper
+
+CAP:cap consistency一致性，availablity可用性，分区容错性partion tolerance。
+
+zookeeper保证了CP，牺牲了A，防止脑裂时，分布式系统的不一致性。而Eureka保证了AP牺牲了C，保证高可用。
 
 zookeeper角色和投票机制：
 
