@@ -294,13 +294,13 @@ class Solution {
 
 ## Java基础
 
-#### Java8
+### Java8
 
 - ThreadLocal.withInitial
 
 
 
-#### 序列化 kryo
+### 序列化 kryo
 
 <https://cloud.tencent.com/developer/article/1511793>
 
@@ -308,7 +308,7 @@ kryo使用指南 <https://blog.csdn.net/andong3791/article/details/101965131?utm
 
 序列化漫谈 <https://www.cnblogs.com/liouwei4083/p/6123383.html>
 
-#### 线程池
+### 线程池
 
 1. newSingleThreadExecutorl()
 
@@ -335,12 +335,6 @@ kryo使用指南 <https://blog.csdn.net/andong3791/article/details/101965131?utm
 
 
 
-
-
-
-
-
-
 #### 线程数量设置
 
 cpu密集型  n+1
@@ -352,6 +346,24 @@ io密集型  2*n+1
 最佳线程数目 =（（线程等待时间+线程cpu时间）/线程cpu时间））*cpu数目
 
 =（等待时间/cpu时间 +1）*cpu数目
+
+## JVM
+
+### gc root有哪些？
+
+虚拟机栈（栈帧中的本地变量表）中引用的对象；本地方法栈JNI中的引用对象；方法区中的类静态属性引用的对象；方法区中常量引用的对象。
+
+### 类加载过程
+
+类的加载过程：加载->连接->初始化
+
+连接分为三个步骤：验证->准备->解析
+
+参考：<https://www.cnblogs.com/ityouknow/p/5603287.html>
+
+为什么要破坏双亲委派类加载机制？
+
+参考：<https://blog.csdn.net/majianxin1/article/details/102604237?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.nonecase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.nonecase>
 
 ## IO
 
