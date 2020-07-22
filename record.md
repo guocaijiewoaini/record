@@ -1,8 +1,22 @@
  -Dvtag=v_vod_material_ztc
 
+
+
+## 每日学习记录
+
+### 2020.7.22  
+
+看序列化 kryo protobuf差异，序列化底层实现
+
+zookeeper的原理，面试题
+
+~~算法leetcode54螺旋数组、字符串的全排列~~  
+
+ICMP  PING
+
 ## 面经收集
 
-#### 07.16
+### 07.16
 
 百度一面面经
 什么是mvc
@@ -20,19 +34,21 @@ dns具体讲讲
 1，一个数组，把偶数放前面，奇数放后面，返回
 2，删除单链表的倒数第k个节点
 
-#### 07.16 百度
+### 07.16 百度
 
 ![1594896231675](C:\Users\ADMINI~1\AppData\Local\Temp\1594896231675.png)
 
-字节9面（微服务）
+### 字节9面（微服务）
 
 <https://www.nowcoder.com/discuss/453852?type=post&order=time&pos=&page=3&channel=1010&source_id=search_post>
 
 ## 算法
 
-#### 排序算法
+### 排序算法
 
-快排
+稳定排序和不稳定排序：<https://www.cnblogs.com/codingmylife/archive/2012/10/21/2732980.html>
+
+#### 快排
 
 ```java
 public void quicksort(int[] nums ,int start, int end){
@@ -60,9 +76,63 @@ public void quicksort(int[] nums ,int start, int end){
 
 ```
 
-#### leetcode
+#### 归并排序
 
-##### leetcode 46 全排列
+讲得非常不错的视频，参考https://www.bilibili.com/video/BV1Ax411U7Xx/
+
+剑指Offer的51题 数组中的逆序对就是归并的思想，参考<https://www.nowcoder.com/questionTerminal/96bd6684e04a44eb80e6a68efc0ec6c5?f=discussion>
+
+下面的题解是针对51题计算逆序对的，比归并排序就多了一行代码---计算cnt。
+
+<span id="Offer51"></span>
+
+```java
+public class Solution {
+    int cnt =0;
+    public int InversePairs(int [] array) {
+        if(array==null||array.length==0) return 0;
+        InversePairs(array,0,array.length-1);
+        return cnt;
+    }
+    
+    public void InversePairs(int [] array,int start,int end) {
+        if(start>=end) return;
+        int mid =(start+end)>>1;
+        InversePairs(array,start,mid);
+        InversePairs(array,mid+1,end);
+        merge(array,start,mid,end);
+    }
+    
+    public void merge(int [] array,int start,int mid,int end) {
+        int tmp[] =new int[end-start+1];
+        int i=start;int j=mid+1;int k=0;
+        while(i<=mid&&j<=end){
+            if(array[i]<=array[j]){
+                tmp[k++]=array[i++];
+            }else{
+                tmp[k++]=array[j++];
+                //计数
+                cnt=(cnt+mid-i+1)%1000000007;//核心代码 计算该次比较的逆序对个数
+            }
+        }
+        while(i<=mid){
+            tmp[k++]=array[i++];
+        }
+        while(j<=end){
+            tmp[k++]=array[j++];
+        }
+        for(int p=start;p<=end;p++){
+            array[p]=tmp[p-start];
+        }
+    }
+}
+```
+
+
+
+### leetcode
+
+#### 46 全排列
 
 全排列用dfs回溯求解。
 
@@ -96,7 +166,7 @@ class Solution {
 }
 ```
 
-##### leetcode 47 全排列
+#### 47 全排列2
 
 这个题比上面46多了一个不可重复，在回溯的基础上要进行剪枝。
 
@@ -106,7 +176,6 @@ class Solution {
 
 ```java
 class Solution {
-
     public List<List<Integer>> permuteUnique(int[] nums) {
         int n =nums.length;
         int[] used =new int[n];
@@ -138,13 +207,106 @@ class Solution {
 }
 ```
 
+#### 54 螺旋矩阵
+
+四个指针控制范围，向右，向下，向左，向上遍历，注意边界条件。
+
+```java
+class Solution {
+    public List<Integer> spiralOrder(int[][] matrix) {
+        List<Integer> list =new ArrayList<>();
+        if(matrix==null||matrix.length==0) return list;  
+        int low =0;
+        int high=matrix.length-1;
+        int left=0;
+        int right=matrix[0].length-1;
+        while(left<=right&&low<=high){
+            for(int i=left;i<=right;i++) list.add(matrix[low][i]);//向右
+
+            for(int i=low+1;i<=high;i++) list.add(matrix[i][right]);//向下
+
+            //向左  if判断防止low,high相等 重复遍历
+            if(low<high){
+                for(int i=right-1;i>=left;i--) list.add(matrix[high][i]);
+            }
+            //向上
+            if(right>left){
+                for(int i=high-1;i>low;i--) list.add(matrix[i][left]);//注意这里i=low位置已经再向右 的过程中被遍历了
+            }
+            left++;
+            low++;
+            right--;
+            high--;
+        }
+        return list;
+    }
+}
+```
 
 
-#### 剑指Offer
+
+### 剑指Offer
 
 #### [剑指 Offer 38. 字符串的排列](https://leetcode-cn.com/problems/zi-fu-chuan-de-pai-lie-lcof/)
 
+```java
+class Solution {
+    public String[] permutation(String s) {
+        //全排列   剪枝需要条件判断
+        char[] chars =s.toCharArray();
+        int n =chars.length;
+        int[] used =new int[n];
+        List<String> rslist =new ArrayList<>();
+
+        Arrays.sort(chars);//排序是剪枝的关键
+
+        StringBuilder sb =new StringBuilder();
+        dfs(chars,n,used,0,rslist,sb);
+        return rslist.toArray(new String[0]);//list转数组  数组类型实例对象作为传参
+    }
+    public void dfs(char[] chars,int n,int[] used,int cur,List<String> rslist,StringBuilder sb){
+        if(cur==n){
+            rslist.add(sb.toString());
+            return;
+        }
+        for(int i=0;i<n;i++){
+            if(used[i]==1){
+                continue;
+            }
+            if(i>0&&chars[i]==chars[i-1]&&used[i-1]==0){//剪枝关键
+                continue;
+            }
+            used[i]=1;
+            sb.append(chars[i]);
+            dfs(chars,n,used,cur+1,rslist,sb);
+            sb.deleteCharAt(sb.length()-1);
+            used[i]=0;
+        }
+    } 
+}
+```
+
+
+
+#### [剑指 Offer 51. 数组中的逆序对](#Offer51)
+
+
+
 ## Java基础
+
+#### Java8
+
+- ThreadLocal.withInitial
+
+
+
+#### 序列化 kryo
+
+<https://cloud.tencent.com/developer/article/1511793>
+
+kryo使用指南 <https://blog.csdn.net/andong3791/article/details/101965131?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-5.nonecase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-5.nonecase>
+
+序列化漫谈 <https://www.cnblogs.com/liouwei4083/p/6123383.html>
 
 #### 线程池
 
@@ -296,7 +458,7 @@ tail -100 /data/logs/php/php_error_5.3.log  | grep  "Memcache::get()";
 
 这样你就可以只查看文件的第5行到第10行。
 
-### 查看端口是否被占用
+#### 查看端口是否被占用
 
 netstat -anp | grep 端口号
 
@@ -390,24 +552,93 @@ OSI中的层            功能                                                  
 
 ### ICMP
 
+ICMP全称是Internet Control Message Protocol，即互联网控制报文协议。
 
+ICMP报文是封装在IP包里面的，工作在网络层，是IP协议的助手。
+
+### PING
+
+ping是基于ICMP协议工作的，参考文章
+
+<https://www.cnblogs.com/xiaolincoding/archive/2020/03/25/12571184.html>
+
+1.首先查本地arp cache信息，看是否有对方的mac地址和IP地址映射条目记录
+2.如果没有，则发起一个arp请求广播包，等待对方告知具体的mac地址
+3.收到arp响应包之后，获得某个IP对应的具体mac地址，有了物理地址之后才可以开始通信了,同时对ip-mac地址做一个本地cache
+4.发出icmp echo request包，收到icmp  echo reply包
 
 ## 中间件
 
 ### Zookeeper
 
+#### CAP理论
+
 CAP:cap consistency一致性，availablity可用性，分区容错性partion tolerance。
 
-zookeeper保证了CP，牺牲了A，防止脑裂时，分布式系统的不一致性。而Eureka保证了AP牺牲了C，保证高可用。
+zookeeper保证了CP，牺牲了A，防止脑裂时，分布式系统的不一致性。而Eureka保证了AP牺牲了C，保证高可用。ZAB 协议是 CAP 理论中 CP 的典型实现，其崩溃恢复阶段涉及到的 Leader 节点选举过程和数据同步选举完成后的数据同步过程都是对外不提供服务的，就是为了保证数据的强一致性牺牲了可用性。
 
-zookeeper角色和投票机制：
+#### zookeeper核心知识
 
 <https://www.cnblogs.com/wlwl/p/10715065.html>
-
-为什么不推荐zookeeper做注册中心？阿里技术文章
-
-<http://jm.taobao.org/2018/06/13/%E5%81%9A%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0%EF%BC%9F/>
 
 zookeeper角色：observer处理读请求，没有投票和选举权。follower处理读请求，leader会根据算法落实到某个follower节点。leader一个集群只有一个，处理写请求，负责发起投票和决议，更新系统状态。每次写请求都会发起投票，只有过半的节点通过才能写入数据。
 
 zookeeper客户端与服务端建立连接会创建session，通过心跳机制来确定session是否过期，如果过期，该客户端的临时节点都会失效。
+
+#### 为什么不推荐zookeeper做注册中心？阿里技术文章
+
+<http://jm.taobao.org/2018/06/13/%E5%81%9A%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0%EF%BC%9F/>
+
+#### Zookeeper如何保证数据的一致性？
+
+<<https://www.cnblogs.com/tkzL/p/12916116.html>>
+
+通过Zab（原子广播）协议保证分布式事务的最终一致性。
+
+Zab协议分为三部分：
+
+1. - **消息广播阶段**
+
+   1. 一个事务请求（Write)进来，Leader会把写请求包装成Proposal事务，并添加一个全局唯一的64位递增事务ID---Zxid。
+   2. Leader广播Proposal事务，将Proposal事务发送到为每个Follower节点单独分配的FIFO队列中。
+   3. Follower收到Proposal后持久化到磁盘，返回ACK。
+   4. Leader收到超过半数的Follower的ACK后（Quorum机制），提交本地机器上的事务，同时开始广播commit，Follower节点收到commit之后，完成各自的事务提交。
+
+   ZAB 协议针对事务请求的处理过程类似于一个两阶段提交过程，第一阶段是广播事务操作，第二阶段是广播提交操作，而在这种两阶段提交模型下，是无法处理因 Leader 节点宕机带来的数据不一致问题的，比如下面两种情况：
+
+   1. 当 Leader（Server1） 发起一个事务 Proposal1 后就宕机了，导致 Follower 都没有 Proposal1。
+   2. 当 Leader 发起 Proposal2 后收到了半数以上的 Follower 的 ACK，但是还没来得及向 Follower 节点发送 Commit 消息就宕机了。
+
+   **为了解决 Leader 宕机以及宕机后导致的数据不一致问题，ZAB 协议引入了崩溃恢复模式。**
+
+   崩溃恢复模式必须解决以下问题：
+
+   1. Server1 恢复过来再次加入到集群中的时候，必须确保丢弃 Proposal1，即保证被丢弃的消息不能再次出现。
+   2. 选举出的新 Leader 必须拥有集群中所有机器 Zxid 最大的 Proposal，即保证已经被处理的消息不能丢。
+
+2. - **崩溃恢复阶段**
+
+   > Zookeeper 集群进入崩溃恢复阶段的时机：
+   >
+   > - 集群服务刚启动时进入崩溃恢复阶段选取 Leader 节点。
+   > - Leader 节点突然宕机或者由于网络原因导致 Leader 节点与过半的 Follower 失去了联系，集群也会进入崩溃恢复模式。
+
+    	选举Leader节点
+
+    - 1. 各个节点变为Looking状态
+
+         Leader宕机后，各个Follower节点状态变更为Looking，参与Leader选举过程。Observer不参与。
+
+      2. 各个Server节点发起投票
+
+         第一次投票所有的节点都会投自己，然后各自将投票发送给集群中的所有机器。
+
+      3. 集群接收各个服务器的投票，处理投票和选举
+
+         判断的依据如下：首先选举 epoch 最大的，如果 epoch 相等，则选 zxid 最大的，若 epoch 和 zxid 都相等，则选择 server id 最大的。在选举过程中，如果有节点获得超过半数的投票数，则会成为 Leader 节点，反之则重新投票选举。
+
+      4. 选举成功，各自的节点状态为Leading和Following。
+
+   - 数据同步
+
+     崩溃恢复完成选举以后，接下来的工作就是数据同步，在选举过程中，通过投票已经确认 Leader 节点是最大 Zxid 的节点，同步阶段就是利用 Leader 前一阶段获得的最新 Proposal 历史同步集群中所有的副本。
