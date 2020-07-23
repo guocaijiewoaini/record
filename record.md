@@ -2,6 +2,8 @@
 
 
 
+面经参考<https://troywu0.gitbooks.io/interview/content/>
+
 ## 每日学习记录
 
 ### 2020.7.22  
@@ -13,6 +15,34 @@ zookeeper的原理，面试题
 ~~算法leetcode54螺旋数组、字符串的全排列~~  
 
 ICMP  PING
+
+### 2020.7.23
+
+新的需求：
+
+**这个下面的都在lz-trend TrendService里**
+
+1. 发布声音 **找不到**
+
+2. 发布动态  sendForwardTrend
+
+3. 分享声音动态  addVoiceTrend 
+
+4. 节目被分享  addProgramTrend
+
+5. 互动：
+
+   回复评论 replyCommentTrend
+
+   点赞评论 likeOperationTrendComment
+
+6. 节目被播放 **找不到**
+
+7. 节目获得点赞 addProgramTrend
+
+8. 。。。。找不到
+
+
 
 ## 面经收集
 
@@ -243,6 +273,30 @@ class Solution {
 }
 ```
 
+64 最小路径和
+
+简单dp，代码如下。
+
+```java
+class Solution {
+    public int minPathSum(int[][] grid) {
+        int n =grid.length-1;
+        int m=grid[0].length-1;
+        int[][] dp =new int[n+1][m+1];
+
+        dp[0][0]=grid[0][0];
+        for(int i=1;i<=n;i++) dp[i][0]=dp[i-1][0]+grid[i][0];
+        for(int j=1;j<=m;j++) dp[0][j]=dp[0][j-1]+grid[0][j];
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=m;j++){
+                dp[i][j]=Math.min(dp[i][j-1],dp[i-1][j])+grid[i][j];
+            }
+        }
+        return dp[n][m];
+    }
+}
+```
+
 
 
 ### 剑指Offer
@@ -297,6 +351,67 @@ class Solution {
 ### Java8
 
 - ThreadLocal.withInitial
+
+- Stream流
+
+  例子如下。
+
+  定义一个Person类：
+
+  ```java
+  class Person{
+      private String name;
+      private int age;
+      private int sex;//0女 1男
+      public Person(String name, int age, int sex) {
+          this.name = name;
+          this.age = age;
+          this.sex = sex;
+      }
+      public String getName() {
+          return name;
+      }
+      public int getAge() {
+          return age;
+      }
+      public int getSex() {
+          return sex;
+      }
+  }
+  ```
+
+  创建集合，演示Stream流：
+
+  ```java
+  public static void main(String[] args) {
+          List<Person> list =new ArrayList<>();
+
+          list.add(new Person("张三",18,1));
+          list.add(new Person("张三",18,1));
+          list.add(new Person("李四",16,0));
+          list.add(new Person("王五",15,1));
+          list.add(new Person("赵六",21,0));
+          list.add(new Person("孙七",10,1));
+
+          //获取年龄大于18的女性的集合
+          List<Person> list1 = list.stream()
+                  .filter(item ->item.getAge()>18&&item.getSex()==1)//年龄大于18 女性
+                  .distinct()//去重
+                  .skip(1)//跳过n个元素
+                  .limit(2)//限制结果个数
+                  .collect(Collectors.toList());
+
+          //遍历
+          list.forEach(item->{
+              System.out.println(item.getSex());
+              System.out.println(item.getAge());
+              System.out.println(item.getName());
+          });
+
+      }
+  ```
+
+  ​
 
 
 
@@ -377,7 +492,7 @@ io密集型  2*n+1
 
 ##### Netty的零拷贝
 
-传统意义的零拷贝
+**传统意义的零拷贝**
 
 mmap和sendFile <https://www.jianshu.com/p/275602182f39>
 
@@ -416,10 +531,11 @@ netty的零拷贝：
 3. 文件传输采用了transferTo方法，底层调用操作系统的sendFile()直接将内核文件缓冲区数据发送到目标channel，避免了传统的通过循环write的方式导致无用的内存拷贝。
 
 
-
 ## 数据库
 
-##### SQL题
+建议阅读	MySQL是怎样运行的：从根儿上理解MySQL
+
+### SQL题
 
 成绩表，三个字段：姓名、课程、成绩，求课程平均成绩大于85的学生姓名和平均成绩
 
@@ -427,7 +543,13 @@ netty的零拷贝：
 select n , sc from (select avg(score) as sc,name as n from tb group by n having sc>85 ) 
 ```
 
-##### join的执行过程
+### Buffer Pool
+
+默认大小为128M，可通过innodb_buffer_pool_size配置。
+
+buffer pool中的缓存页大小为16KB，每个缓存页都包含控制信息，
+
+### join的执行过程
 
 
 
@@ -567,6 +689,14 @@ OSI中的层            功能                                                  
 ICMP全称是Internet Control Message Protocol，即互联网控制报文协议。
 
 ICMP报文是封装在IP包里面的，工作在网络层，是IP协议的助手。
+
+ICMP的报文种类有两种：差错报告报文、查询报文。
+
+报文格式包括1个字节的类型，1个字节的code代码，2个字节的校验和，长度可变的数据。
+
+差错报告报文包括：目的不可达、源主机消亡、超时、参数问题、重定向。查询报文包括：回应请求和应答、信息请求和应答（已弃用）、时间戳和时间戳应答、地址掩码请求和应答、路由器通告和请求。
+
+参考：<https://www.cnblogs.com/ccsccs/articles/4224441.html>
 
 ### PING
 
