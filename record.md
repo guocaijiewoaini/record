@@ -451,6 +451,162 @@ class Solution {
 }
 ```
 
+#### [208. 实现 Trie (前缀树)](https://leetcode-cn.com/problems/implement-trie-prefix-tree/)
+
+这道题应该将节点抽象成单独类，容易理解和编写代码。暂时放上能通过的粗糙版代码。如果前缀树存储中文的话，就不能使用数组了，而应该用Map。
+
+```java
+class Trie {
+    public Trie[] trie;
+    public boolean isEnd;
+    private final int R=26;
+    /** Initialize your data structure here. */
+    public Trie() {
+        trie=new Trie[R];
+    }
+    
+    /** Inserts a word into the trie. */
+    public void insert(String word) {
+        char[] chars = word.toCharArray();
+        Trie t =this;
+        for(int i=0;i<chars.length;i++){
+            Trie[] tnext=t.trie;
+            if(tnext[chars[i]-'a']==null){
+                tnext[chars[i]-'a'] =new Trie();
+            }
+            t=tnext[chars[i]-'a'];
+        }
+        t.isEnd = true;
+    }
+    
+    /** Returns if the word is in the trie. */
+    public boolean search(String word) {
+        char[] chars = word.toCharArray();
+        Trie t =this;
+        for(int i=0;i<chars.length;i++){
+            Trie[] tnext=t.trie;
+            // if(i==chars.length-1&&tnext[chars[i]-'a']!=null&&t.isEnd) return true;
+            if(tnext[chars[i]-'a']==null) {
+                return false;
+            }else{
+                t=tnext[chars[i]-'a'];
+            } 
+        }
+        return t.isEnd;
+    }
+    
+    /** Returns if there is any word in the trie that starts with the given prefix. */
+    public boolean startsWith(String prefix) {
+        char[] chars = prefix.toCharArray();
+        Trie t =this;
+        for(int i=0;i<chars.length;i++){
+            Trie[] tnext=t.trie;
+            if(tnext[chars[i]-'a']==null) {
+                return false;
+            }else{
+                t=tnext[chars[i]-'a'];
+            } 
+        }
+        return true;
+    }
+}
+
+/**
+ * Your Trie object will be instantiated and called as such:
+ * Trie obj = new Trie();
+ * obj.insert(word);
+ * boolean param_2 = obj.search(word);
+ * boolean param_3 = obj.startsWith(prefix);
+ */
+```
+
+重写代码如下，自定义node类
+
+```java
+class Trie {
+    private TrieNode root;
+    /** Initialize your data structure here. */
+    public Trie() {
+        root =new TrieNode();
+    }
+    /** Inserts a word into the trie. */
+    public void insert(String word) {
+        char[] chars =word.toCharArray();
+        TrieNode n =root;
+        for(int i=0;i<chars.length;i++){
+            char ch =chars[i];
+            if(!n.contains(ch)){
+                n.put(ch);
+            }
+            n=n.get(ch);
+        }
+        n.setEnd();
+    }
+    
+    /** Returns if the word is in the trie. */
+    public boolean search(String word) {
+        char[] chars =word.toCharArray();
+        TrieNode n =root;
+        for(int i=0;i<chars.length;i++){
+            char ch =chars[i];
+            if(!n.contains(ch)) return false;
+            else{
+                n=n.get(ch);
+            }
+        }
+        return n.isEnd();
+    }
+    
+    /** Returns if there is any word in the trie that starts with the given prefix. */
+    public boolean startsWith(String prefix) {
+        char[] chars =prefix.toCharArray();
+        TrieNode n =root;
+        for(int i=0;i<chars.length;i++){
+            char ch =chars[i];
+            if(!n.contains(ch)) return false;
+            else{
+                n=n.get(ch);
+            }
+        }
+        return true;
+    }
+}
+
+class TrieNode{
+    private TrieNode[] next;
+    private boolean isEnd;
+    private final int R =26;
+    public TrieNode(){
+        next =new TrieNode[R];
+    }
+    public TrieNode get(char ch){
+        return next[ch-'a'];
+    }
+    public void put(char ch){
+        next[ch-'a'] =new TrieNode();
+    }
+    public boolean contains(char ch){
+        return next[ch-'a']!=null;
+    }
+    public boolean isEnd(){
+        return isEnd;
+    }
+    public void setEnd(){
+        isEnd=true;
+    }
+}
+
+/**
+ * Your Trie object will be instantiated and called as such:
+ * Trie obj = new Trie();
+ * obj.insert(word);
+ * boolean param_2 = obj.search(word);
+ * boolean param_3 = obj.startsWith(prefix);
+ */
+```
+
+
+
 #### [234. 回文链表](https://leetcode-cn.com/problems/palindrome-linked-list/)
 
 最优解：快慢指针，快指针每次走两个节点，慢指针每次一个节点，每次走的时候，将节点next指向反转。直到退出循环，如果是回文链表，此时前半部分和后半部分是一致的。
