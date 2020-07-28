@@ -24,15 +24,15 @@ ICMP  PING
 
 1. 发布声音 **找不到**
 
-2. 发布动态  sendForwardTrend
+2. 发布动态  sendForwardTrend         kafka producer:trendProducer
 
-3. 分享声音动态  addVoiceTrend 
+3. 分享声音动态  addVoiceTrend        kafka producer:trendProducer
 
-4. 节目被分享  addProgramTrend
+4. 节目被分享  addProgramTrend       
 
 5. 互动：
 
-   回复评论 replyCommentTrend
+   回复评论 replyCommentTrend             trendCommentProducer
 
    点赞评论 likeOperationTrendComment
 
@@ -42,9 +42,39 @@ ICMP  PING
 
 8. 。。。。找不到
 
+### 2020.7.24
+
+公司app debug版本使用方法。（踩坑）
+
+- 下载debug测试版本apk，安装。
+- 连接office wifi，修改手机wifi dns 为公司dns
+- 扫码绑定灯塔迭代。（这样请求才会去灯塔）
+- 登录的时候输入170以后的手机号，获取验证码。
+- 去录播小工具里获取redis中的验证码，填入手机成功登录。
+
+模拟用户手机号 17021312166
+
+进入主播中心页面时，需要再次登录，这时要在debug设置中关闭实名认证，不然登录完会再次跳转到登录页面
+
 
 
 ## 面经收集
+
+### 智力题
+
+百度：140克沙子，2g和7g的砝码，称50g沙子，要求称的次数最少
+
+​	方法1：2g和7g称出9g，9g+7g称出来16g(称两次)，16g+2g+7g+9g+16g=50g
+
+​	方法2：
+
+腾讯 字节：64匹马，8个赛道，如何最少次比赛确定跑的最快的4匹马？
+
+<https://blog.csdn.net/weichi7549/article/details/107371789/>
+
+10场或者11场比赛得出结果，最后这个判断是解题的精髓。
+
+
 
 ### 07.16
 
@@ -71,6 +101,10 @@ dns具体讲讲
 ### 字节9面（微服务）
 
 <https://www.nowcoder.com/discuss/453852?type=post&order=time&pos=&page=3&channel=1010&source_id=search_post>
+
+### 快手面经
+
+<https://www.nowcoder.com/discuss/426600?toCommentId=6170066>
 
 ## 算法
 
@@ -161,6 +195,40 @@ public class Solution {
 
 
 ### leetcode
+
+#### K链表翻转
+
+#### 39 组合总和
+
+回溯+剪枝，为了剪枝，每次for循环不从0开始。
+
+```java
+class Solution {
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        List<List<Integer>> list =new ArrayList<>();
+        ArrayDeque<Integer> deque =new ArrayDeque<>();
+        Arrays.sort(candidates);
+        dfs(candidates,candidates.length,0,target,list,deque);
+        return list;
+    }
+    public void dfs(int[] arr,int n,int cur,int sum,List<List<Integer>> list,ArrayDeque<Integer> deque){
+        if(sum==0){
+            list.add(new ArrayList<>(deque));
+            return;
+        }
+        for(int i=cur;i<n;i++){
+            if(sum<0){
+                return;
+            }
+            deque.add(arr[i]);
+            dfs(arr,n,i,sum-arr[i],list,deque);
+            deque.removeLast();
+        }
+    }
+}
+```
+
+
 
 #### 46 全排列
 
@@ -464,7 +532,23 @@ io密集型  2*n+1
 
 ## JVM
 
-### gc root有哪些？
+### jstack
+
+
+
+### 如何排查OOM？
+
+1. ps -aux| grep java查看一下java进程，找到对应进程的pid。
+2. top 查看cpu、内存使用率，看%MEM这列，对应的进程是不是占用很高。
+3. jstat -gcutil pid 1000 10，用jstat工具对指定pid的进程查看新生代老年代内存使用率，young gc和full gc的次数，1000ms打印一次，一共打印10次。
+4. jmap -histo pid打印出当前堆中所有每个类的实例数量和内存占用
+5. jmap -dump:format=b,file=文件名 [pid]，把指定java进程的堆内存快照dump到指定的文件进行快照分析
+
+
+
+
+
+### GC ROOTS
 
 虚拟机栈（栈帧中的本地变量表）中引用的对象；本地方法栈JNI中的引用对象；方法区中的类静态属性引用的对象；方法区中常量引用的对象。
 
@@ -535,6 +619,45 @@ netty的零拷贝：
 
 建议阅读	MySQL是怎样运行的：从根儿上理解MySQL
 
+需要了解的知识点
+
+```shell
+一、MySQL InnoDB 存储原理深入剖析
+    MySQL记录存储
+    页头
+    虚记录
+    记录堆
+    自由空间链表
+    未分配空间
+    Slot 区
+    页尾
+    业内记录维护
+    顺序保证
+    插入策略
+    页内查询
+二、MySQL InnoDB 索引实现原理及主键设计选择分析
+    聚簇索引
+    二级索引
+    联合索引
+    主键选择分析
+三、MySQL InnoDB 存储引擎内存管理
+    Buffer Pool
+    Page
+    Free list
+    Flush list
+    Page Hash 表
+    LRU
+四、MySQL InnoDB 存储引擎事务实现原理
+    MySQL 事务基本概念
+    事务特性
+    并发问题
+    隔离级别
+    MySQL 事务实现原理
+    MVCC
+    undo log
+    redo log
+```
+
 ### SQL题
 
 成绩表，三个字段：姓名、课程、成绩，求课程平均成绩大于85的学生姓名和平均成绩
@@ -542,6 +665,24 @@ netty的零拷贝：
 ```SQL
 select n , sc from (select avg(score) as sc,name as n from tb group by n having sc>85 ) 
 ```
+
+### 联合索引
+
+联合索引的结构 <https://blog.csdn.net/ibigboy/article/details/104571930?depth_1->
+
+### 说说索引优化
+
+- 对常用作为条件查询的字段建立索引。
+
+- 尽量不使用长字符串做索引，占用空间巨大。
+
+- 按照联合索引的最左匹配原则编写SQL。
+
+- mysql5.6以后可以 开启索引下推，减少存储引擎返回的数据量，将数据的条件筛选在引擎端完成。<https://www.cnblogs.com/Chenjiabing/p/12600926.html>
+
+  可以减少存储引擎查询基础表的次数，也可以减少MYSQL服务器从存储引擎接收数据的次数。
+
+- 开启mrr，将随机io优化成为顺序io，对于机械硬盘会提升很大性能。
 
 ### Buffer Pool
 
@@ -684,6 +825,14 @@ OSI中的层            功能                                                  
 
 物理层：中继器、集线器、还有我们通常说的双绞线也工作在物理层
 
+### DNS
+
+详解DNS: <https://zhuanlan.zhihu.com/p/79350395>
+
+DNS用到UDP和TCP，**域名解析**使用UDP，简单，速度快，只要一个请求一个应答即可。但是UDP传输不超过512字节，不过DNS查询域名一般返回内容都不超过512字节。区域传送使用TCP，
+
+
+
 ### ICMP
 
 ICMP全称是Internet Control Message Protocol，即互联网控制报文协议。
@@ -710,6 +859,52 @@ ping是基于ICMP协议工作的，参考文章
 4.发出icmp echo request包，收到icmp  echo reply包
 
 ## 中间件
+
+### Redis
+
+#### 淘汰策略
+
+1. noeviction  不会继续服务写请求
+2. volatile-lru 最少使用的key被淘汰（只针对设置了过期时间的key）
+3. volatile-ttl 淘汰ttl最小的key
+4. volatile-random 淘汰过期key集合中的随机的key
+
+####  volatile策略只会针对带过期时间的 key 进行淘汰
+
+5. allkeys-lru  同 volatile-lru，但是 key 针对是全体的 key 集合。
+6. allkeys-random 同 volatile-random，但是 key 针对是全体的 key 集合。
+
+### Dubbo(RPC)
+
+#### 负载均衡（4种实现）
+
+官网文档：<http://dubbo.apache.org/zh-cn/docs/source_code_guide/loadbalance.html>
+
+1. 基于权重随机算法的RandomLoadBalance。   按照权重值进行均匀随机分配。
+
+2. 基于最小活跃调用数算法的LeastActiveLoadBalance。 所有服务提供者初始活跃数为0，收到请求+1，处理完请求-1.再服务运行一段时间后，如果某个服务提供者活跃调用数越少，表明该服务提供者效率越高，单位时间内可处理的请求更多。
+
+3. 基于加权轮询算法的RoundRobinLoadBalance。按权重比例分配请求数量。
+
+   如A,B,C权重为[2,5,1]  则8次请求的顺序是 A B C A B B B B，即轮询+加权
+
+4. 基于hash一致性算法的ConsistentHashLoadBalance。根据 ip 或者其他的信息为缓存节点生成一个 hash，并将这个 hash 投射到 [0, 2^32 - 1] 的圆环上。当有查询或写入请求时，则为缓存项的 key 生成一个 hash 值。然后查找第一个大于或等于该 hash 值的缓存节点。
+
+   ​
+
+
+
+### Kafka
+
+**如何防止重复消费？**
+
+1. 同步提交，会有性能影响。
+2. 消息使用唯一id标识-->落表（主键或者唯一索引避免重复）或者选择唯一主键存储到redis，若存在则不处理，不存在则插入后处理。
+
+**如何防止消息丢失？**
+
+1. 生产者丢失-->使用producer.send(msg,callback)回调机制获取消息是否发送成功，未成功则重试。
+2. 消费者丢失-->先消费消息，再更新offset。防止offset更新没有消费完成导致丢失。
 
 ### Zookeeper
 
