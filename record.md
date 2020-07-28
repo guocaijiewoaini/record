@@ -56,6 +56,16 @@ ICMP  PING
 
 进入主播中心页面时，需要再次登录，这时要在debug设置中关闭实名认证，不然登录完会再次跳转到登录页面
 
+### 2020.7.28
+
+荔枝动态
+
+msg: v_dianbo_mission!%#clientIp:192.168.10.33,producerIp:172.18.10.218,bizEnv:lizhi!%#{"platform":29,"time":1595920857430,"userId":5124103437373412396,"voiceId":2801883327137716742,"voiceUserId":2639561500921979948}
+
+QQ
+
+msg: v_dianbo_mission!%#clientIp:192.168.10.33,producerIp:172.18.10.218,bizEnv:lizhi!%#{"content":"测试_51","platform":24,"time":1595920905458,"userId":5124103437373412396,"voiceId":2801883327137716742,"voiceUserId":2639561500921979948}
+
 
 
 ## 面经收集
@@ -341,7 +351,7 @@ class Solution {
 }
 ```
 
-64 最小路径和
+#### 64 最小路径和
 
 简单dp，代码如下。
 
@@ -361,6 +371,122 @@ class Solution {
             }
         }
         return dp[n][m];
+    }
+}
+```
+
+#### [94. 二叉树的中序遍历](https://leetcode-cn.com/problems/binary-tree-inorder-traversal/)
+
+非递归，借助栈。stack先push左子节点，直到为空，此时取出栈顶的第一个节点tmp，再做前面的操作......当栈为空并且tmp为空时退出循环。
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public List<Integer> inorderTraversal(TreeNode root) {
+        TreeNode r =root;
+        List<Integer> list =new ArrayList<>();
+        if(root==null) return list;
+        Stack<TreeNode> stack =new Stack<>();
+        // stack.push(root);
+        while(!stack.isEmpty()||r!=null){
+            if(r!=null){
+                stack.push(r);
+                r=r.left;
+            }
+            else{
+                TreeNode n =stack.pop();
+                list.add(n.val);
+                r =n.right;
+            }
+        }
+        return list;
+    }
+}
+```
+
+
+
+#### [144. 二叉树的前序遍历](https://leetcode-cn.com/problems/binary-tree-preorder-traversal/)
+
+递归的很简单就不用说了，主要看非递归的。
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    //非递归
+    public List<Integer> preorderTraversal(TreeNode root) {
+        // TreeNode r =root;
+        Stack<TreeNode> stack =new Stack<>();
+        List<Integer> list =new ArrayList<>();
+        if(root==null) return list;
+        stack.push(root);
+        while(!stack.isEmpty()){
+            TreeNode n =stack.pop();
+            list.add(n.val);
+            if(n.right!=null){
+                stack.push(n.right);
+            }
+            if(n.left!=null){
+                stack.push(n.left);
+            }
+        }
+        return list;
+    }
+}
+```
+
+#### [234. 回文链表](https://leetcode-cn.com/problems/palindrome-linked-list/)
+
+最优解：快慢指针，快指针每次走两个节点，慢指针每次一个节点，每次走的时候，将节点next指向反转。直到退出循环，如果是回文链表，此时前半部分和后半部分是一致的。
+
+ if(fast!=null) slow = slow.next; 这段是当链表节点为奇数个时，跳过中间那个节点。
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public boolean isPalindrome(ListNode head) {
+        if(head==null||head.next==null) return true;
+        ListNode slow =head;
+        ListNode fast =head;
+        ListNode pre = null;
+        ListNode cur = head;
+        while(fast!=null&&fast.next!=null){
+            cur =slow;
+            slow =slow.next;
+            fast =fast.next.next;
+            cur.next=pre;
+            pre =cur;
+        }
+        if(fast!=null) slow = slow.next;
+        while(slow!=null){
+            if(slow.val!=cur.val) return false;
+            slow =slow.next;
+            cur= cur.next;
+        }
+        return true;
     }
 }
 ```
