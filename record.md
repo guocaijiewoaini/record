@@ -52,11 +52,17 @@ ICMP  PING
 - 登录的时候输入170以后的手机号，获取验证码。
 - 去录播小工具里获取redis中的验证码，填入手机成功登录。
 
-模拟用户手机号 17021312166
+模拟用户手机号 **17021312166**
 
 进入主播中心页面时，需要再次登录，这时要在debug设置中关闭实名认证，不然登录完会再次跳转到登录页面
 
 ### 2020.7.28
+
+前缀树
+
+用户动态触发 kafka消息 test
+
+分享声音到：
 
 荔枝动态
 
@@ -66,7 +72,59 @@ QQ
 
 msg: v_dianbo_mission!%#clientIp:192.168.10.33,producerIp:172.18.10.218,bizEnv:lizhi!%#{"content":"测试_51","platform":24,"time":1595920905458,"userId":5124103437373412396,"voiceId":2801883327137716742,"voiceUserId":2639561500921979948}
 
+### 2020.7.29
 
+广联达笔试第一题
+
+```c++
+作者：Chauncey_Wu
+链接：https://www.nowcoder.com/discuss/462337?type=post&order=time&pos=&page=1&channel=1009&source_id=search_post
+来源：牛客网
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <queue>
+ 
+using namespace std;
+ 
+int main() {
+    int n, m, x;   // m 次数   x高度
+    cin >> n >> m >> x;
+    if (n == 1) {
+        cout << m * x << endl;
+        return 0;
+    }
+    auto p = [](pair<int, int>a, pair<int, int>b) {return a.first > b.first; };
+    priority_queue<pair<int, int>, vector<pair<int, int>>, decltype(p) > height(p);
+    int h;
+    while (n--) {
+        cin >> h;
+        height.push(make_pair(h, 0));
+    }
+    int t = height.top().first;
+    height.pop();
+    height.push(make_pair(t, -1));
+    while (m--) {
+        int temp1 = height.top().first, temp2 = height.top().second;
+        height.pop();
+        height.push(make_pair(temp1 + x, temp2));
+    }
+    int res = 0;
+    while (height.top().second == 0) {
+        height.pop();
+    }
+    res = height.top().first;
+    cout << res << endl;;
+ 
+    system("pause");
+    return 0;
+}
+```
+
+第一题忘了 反正小根堆直接解
+第二题就是给一个序列，只能用一种操作---令x为最小的有重复的数字，删除从左数的第一个x，把第二个变为2*x，一直这样操作，得到最终序列是什么。。。序列最长能到50000
+第三题就是给n个数，最多是m位，m小于20印象中，然后a&b=b，表示数a能包含数b，然后把这些数分堆，每堆只能有一个底座（也就是a&b=b的a），求这些数最少有几个这样的a就能把所有数都放在底座上（只要满足关系就行。。），然后还有个特殊，就是可以有一次操作，操作位把某个数的某个二进制位的数变换一下，就是求最少了。。。
 
 ## 面经收集
 
@@ -647,6 +705,43 @@ class Solution {
 }
 ```
 
+#### [283. 移动零](https://leetcode-cn.com/problems/move-zeroes/)
+
+双指针，各自遍历一次。
+
+```java
+class Solution {
+    public void moveZeroes(int[] nums) {
+        int j =0 ;
+        for(int i=0;i<nums.length;i++){
+            if(nums[i]!=0){
+                nums[j++]=nums[i];
+            }
+        }
+        for(;j<nums.length;j++){
+            nums[j]=0;
+        }
+    }
+}
+```
+
+或者双指针，一次遍历
+
+```java
+class Solution {
+    public void moveZeroes(int[] nums) {
+        int j =0 ;
+        for(int i=0;i<nums.length;i++){
+            if(nums[i]!=0){
+                int tmp =nums[i];
+                nums[i]=nums[j];
+                nums[j++]=tmp;
+            }
+        }
+    }
+}
+```
+
 
 
 ### 剑指Offer
@@ -759,10 +854,23 @@ class Solution {
           });
 
       }
+
   ```
 
   ​
 
+
+### 集合
+
+#### HashMap
+
+数组+链表实现的，链表的出现是为了解决hash冲突。HashMap初始化的时候，Entry数组不会实例化，在第一次进行put操作的时候初始化数组。
+
+默认大小size是16，loadFactor默认0.75，threshold是前面两个乘积，当Map中的元素个数超过threshold时，会发生扩容。
+
+
+
+put操作的时候，对存储的键值对的key获取hashCode，再进行扰动计算，然后hash&(n-1)得到元素在数组中应该存储的位置，然后从这个位置顺着链表往下对每个元素进行比较（先==再equal）
 
 
 ### 序列化 kryo
@@ -798,8 +906,6 @@ kryo使用指南 <https://blog.csdn.net/andong3791/article/details/101965131?utm
 底层都是new ThreadPoolExecutor(//参数)实例化得到的
 
 
-
-
 #### 线程数量设置
 
 cpu密集型  n+1
@@ -812,11 +918,99 @@ io密集型  2*n+1
 
 =（等待时间/cpu时间 +1）*cpu数目
 
+### 单例模式
+
+#### 双检锁
+
+```java
+/**
+ * 双检锁
+ */
+public class Singleton1 {
+    private volatile static Singleton1 instance ;
+
+    private Singleton1(){}
+
+    public static Singleton1 getInstance(){
+        //判断单例对象是否为空，避免不必要的锁获取
+        if(instance==null){
+            //锁类对象，防止多个线程实例化instance
+            synchronized (Singleton1.class){
+                //判断单例对象是否为空，避免其他线程在此之前获取到锁，已经进行了实例化
+                if(instance==null){
+                    instance =new Singleton1();//instance使用volatile修饰，防止指令重排，防止出现线程不安全情况。
+                }
+            }
+        }
+        return instance;
+    }
+}
+
+```
+
+#### 静态内部类
+
+> 注：外部类可以访问到静态内部类的private成员。如果外部类和内部类要访问对方的private/protected成员时，javac编译会生成合适的"access method"----access$xxx形式的方法提供合适的可访问性（通过javap -c反编译字节码可以看到该方法）。
+
+```java
+/**
+ * 静态内部类
+ */
+public class Singleton2 {
+//    private static Singleton2 instance;
+
+    private Singleton2(){}
+
+    private static class innerClass{
+        private static Singleton2 instance =new Singleton2();
+    }
+    public static Singleton2 getInstance(){
+        return innerClass.instance;
+    }
+
+}
+
+```
+
+
+
 ## JVM
+
+### 运行时数据区
+
+1. 堆：存储对象实例和数组
+
+   堆可细分为Young Gen和Old Gen，Young Gen分为Eden、from survivor和to survivor，默认8：1：1。
+
+   JVM每次只使用Eden和其中的一块Survivor区来服务对象。
+
+   堆区的虚拟机参数配置：
+
+   -Xms:初始堆大小
+
+   -Xmx:最大堆大小
+
+   -Xmn:年轻代大小
+
+   -XXSurvivorRatio:年轻代中Eden区和Survivor区的大小比值
+
+   ​
+
+2. 虚拟机栈：存储栈帧，栈帧是对应方法的内存模型，包含了局部变量表， 操作数栈，动态链接和方法出口。
+
+3. 本地方法栈：类似虚拟机栈，但是里面的方法是native的
+
+4. 程序计数器：相当于字节码执行的行号指令器。（唯一一个没有OOM情况的区域）
+
+5. 方法区：保存被加载的类的信息和常量、静态变量、即时编译器编译后的代码。
+
+   （JDK1.7以后，字符串常量池已经被移出方法区了）
+
+
 
 ### jstack
 
-
+jstack可以定位哪些问题？ <https://www.cnblogs.com/chenpi/p/5377445.html>
 
 ### 如何排查OOM？
 
@@ -845,6 +1039,10 @@ io密集型  2*n+1
 为什么要破坏双亲委派类加载机制？
 
 参考：<https://blog.csdn.net/majianxin1/article/details/102604237?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.nonecase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.nonecase>
+
+### 字节码
+
+一般通过 javac xxx.java 编译java文件->class文件，再通过javap -c xxx.class反编译生成
 
 ## IO
 
@@ -900,6 +1098,24 @@ netty的零拷贝：
 ## 数据库
 
 建议阅读	MySQL是怎样运行的：从根儿上理解MySQL
+
+### mysql架构图
+
+![img](https://www.linuxidc.com/upload/2018_11/181121105137362.png)
+
+非聚簇索引=辅助索引
+
+### Myisam和Innodb区别
+
+myisam不支持事务，而innodb支持事务。
+
+myisam只有表级锁，而innodb支持表、行级锁
+
+容灾性差、而innodb有redo log，用于容灾恢复
+
+InnoDB是聚集索引，使用B+树作为索引结构，数据文件和（主键）索引绑在一起，必须要有主键，通过主键索引效率很高。辅助索引查找一般要进行回表查询，主键过大会导致其他索引页很大。MyISAM是非聚集索引，也是B+树结构，但是索引和数据文件是分离的，索引保存的是数据文件的指针。
+
+参考：<https://blog.csdn.net/qq_35642036/article/details/82820178>
 
 需要了解的知识点
 
@@ -1175,8 +1391,9 @@ ping是基于ICMP协议工作的，参考文章
    ​
 
 
-
 ### Kafka
+
+作用：解耦、异步、削峰
 
 **如何防止重复消费？**
 
