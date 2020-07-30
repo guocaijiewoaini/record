@@ -74,57 +74,25 @@ msg: v_dianbo_mission!%#clientIp:192.168.10.33,producerIp:172.18.10.218,bizEnv:l
 
 ### 2020.7.29
 
-广联达笔试第一题
+广联达笔试
 
-```c++
-作者：Chauncey_Wu
-链接：https://www.nowcoder.com/discuss/462337?type=post&order=time&pos=&page=1&channel=1009&source_id=search_post
-来源：牛客网
+第一题小顶堆排序求解。
 
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <queue>
- 
-using namespace std;
- 
-int main() {
-    int n, m, x;   // m 次数   x高度
-    cin >> n >> m >> x;
-    if (n == 1) {
-        cout << m * x << endl;
-        return 0;
-    }
-    auto p = [](pair<int, int>a, pair<int, int>b) {return a.first > b.first; };
-    priority_queue<pair<int, int>, vector<pair<int, int>>, decltype(p) > height(p);
-    int h;
-    while (n--) {
-        cin >> h;
-        height.push(make_pair(h, 0));
-    }
-    int t = height.top().first;
-    height.pop();
-    height.push(make_pair(t, -1));
-    while (m--) {
-        int temp1 = height.top().first, temp2 = height.top().second;
-        height.pop();
-        height.push(make_pair(temp1 + x, temp2));
-    }
-    int res = 0;
-    while (height.top().second == 0) {
-        height.pop();
-    }
-    res = height.top().first;
-    cout << res << endl;;
- 
-    system("pause");
-    return 0;
-}
-```
+第二题第二题就是给一个序列，只能用一种操作---令x为最小的有重复的数字，删除从左数的第一个x，把第二个变为2*x，一直这样操作，得到最终序列是什么。
 
-第一题忘了 反正小根堆直接解
-第二题就是给一个序列，只能用一种操作---令x为最小的有重复的数字，删除从左数的第一个x，把第二个变为2*x，一直这样操作，得到最终序列是什么。。。序列最长能到50000
-第三题就是给n个数，最多是m位，m小于20印象中，然后a&b=b，表示数a能包含数b，然后把这些数分堆，每堆只能有一个底座（也就是a&b=b的a），求这些数最少有几个这样的a就能把所有数都放在底座上（只要满足关系就行。。），然后还有个特殊，就是可以有一次操作，操作位把某个数的某个二进制位的数变换一下，就是求最少了。。。
+Map保存元素和索引，while循环一直找Map中存在等于当前值的数，修改对应索引的值。
+
+第三题给n个数，最多是m位二进制，m小于20，然后a&b=b，表示数a能包含数b，然后把这些数分堆，每堆只能有一个底座（也就是a&b=b的a），求这些数最少有几个这样的a就能把所有数都放在底座上（只要满足关系就行。。），然后还有个特殊，就是可以有一次操作，操作位把某个数的某个二进制位的数变换一下，就是求最少的堆个数。
+
+不会做。。。
+
+### 2020.7.30
+
+操作系统 段页管理机制
+
+leetcode 337 11 111
+
+
 
 ## 面经收集
 
@@ -174,7 +142,181 @@ dns具体讲讲
 
 <https://www.nowcoder.com/discuss/426600?toCommentId=6170066>
 
-## 算法
+## 算法+数据结构
+
+### 生产者消费者模型代码
+
+参考：<https://baijiahao.baidu.com/s?id=1651415806527193535&wfr=spider&for=pc>
+
+实现方式有两种：
+
+方法一：借助阻塞队列，生产者put，当队列满，put线程阻塞。消费者take，当队列空，take线程阻塞。
+
+首先定义消息结构Message。
+
+```java
+public class Message {
+    private String msg;
+    private int code;
+    //.....
+
+    public Message(String msg, int code) {
+        this.msg = msg;
+        this.code = code;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public int getCode() {
+        return code;
+    }
+}
+```
+
+编写生产者代码。
+
+```java
+public class Producer extends Thread {
+    private final BlockingQueue<Message> queue;
+    public Producer(BlockingQueue<Message> queue){
+        this.queue=queue;
+    }
+    @Override
+    public void run() {
+        for(int i=0;i<10;i++){//模拟生产消息
+            try {
+                queue.put(new Message(Thread.currentThread().getName()+i,0));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+}
+```
+
+编写消费者代码，并且编写main函数运行测试。
+
+```java
+public class Consumer extends Thread{
+    private final BlockingQueue<Message> queue;
+    public Consumer(BlockingQueue<Message> queue){
+        this.queue=queue;
+    }
+
+    @Override
+    public void run() {
+        while(true){
+            try {
+                Message msg = queue.take();
+                System.out.println("code: "+msg.getCode()+" msg: "+msg.getMsg());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    public static void main(String[] args) {
+        LinkedBlockingQueue<Message> messages = new LinkedBlockingQueue<>(10);//队列大小
+        Thread producer =new Producer(messages);
+        Thread consumer =new Consumer(messages);
+
+        producer.start();//启动生产线程
+        consumer.start();//启动消费线程
+
+        System.out.println();
+    }
+}
+```
+
+方法二：普通队列，借助wait()和notify()机制
+
+生产者
+
+```java
+public class Producer extends Thread {
+    private Queue<Message> queue;
+    private int size;
+    public Producer(Queue<Message> queue,int size){
+        this.queue=queue;
+        this.size=size;
+    }
+
+    @Override
+    public void run() {
+        while (true){
+            synchronized (queue) {
+                while (queue.size() >= size) {
+                    System.out.println("队列已经达到上限");
+                    try {
+                        queue.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                queue.add(new Message(Thread.currentThread() + UUID.randomUUID().toString().substring(0, 3), 0));
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+
+```
+
+消费者和main函数
+
+```java
+public class Consumer extends Thread{
+    private Queue<Message> queue;
+
+    public Consumer(Queue<Message> queue){
+        this.queue=queue;
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            synchronized (queue) {
+                while (queue.size() <= 0) {
+                    System.out.println("队列空了");
+                    try {
+                        queue.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                Message msg = queue.poll();
+                System.out.println("code: " + msg.getCode() + " msg: " + msg.getMsg());
+                queue.notifyAll();
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Queue<Message> queue =new LinkedList<>();
+
+        Thread producer =new Producer(queue,10);
+        Thread consumer =new Consumer(queue);
+
+        producer.start();
+        consumer.start();
+    }
+}
+```
+
+
 
 ### 排序算法
 
@@ -263,6 +405,30 @@ public class Solution {
 
 
 ### leetcode
+
+#### [11. 盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water/)
+
+双指针法，一前一后向内移动，每次移动高度小的指针。
+
+```java
+class Solution {
+    public int maxArea(int[] height) {
+        int l =0,r=height.length-1;
+        int s =0;
+        while(l<r){
+            s = Math.max(s,Math.min(height[l],height[r])*(r-l));
+            if(height[l]>height[r]) {
+                r--;
+            }else{
+                l++;
+            }
+        }
+        return s;
+    }
+}
+```
+
+
 
 #### K链表翻转
 
@@ -468,6 +634,74 @@ class Solution {
         return list;
     }
 }
+```
+
+#### [111. 二叉树的最小深度](https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/)
+
+这个题跟最大深度差不多，但是有个小坑。
+
+这道题的关键是搞清楚递归结束条件
+
+叶子节点的定义是左孩子和右孩子都为 null 时叫做叶子节点
+当 root 节点左右孩子都为空时，返回 1
+当 root 节点左右孩子有一个为空时，返回不为空的孩子节点的深度
+当 root 节点左右孩子都不为空时，返回左右孩子较小深度的节点值
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public int minDepth(TreeNode root) {
+        if(root==null) return 0;
+        int left =minDepth(root.left);
+        int right = minDepth(root.right);
+        return root.left==null||root.right==null?left+right+1:Math.min(left,right)+1;
+    }
+}
+```
+
+非递归的方式如下。
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    //非递归
+    public int minDepth(TreeNode root) {
+        if(root==null) return 0;
+        Queue<TreeNode> queue =new LinkedList<>();
+        queue.add(root);
+        int depth =0;
+        int size =1;
+        while(!queue.isEmpty()){
+            TreeNode t =queue.poll();
+            size--;
+            if(t.left==null&&t.right==null){
+                return depth+1;
+            }
+            if(t.left!=null) queue.add(t.left);
+            if(t.right!=null) queue.add(t.right);
+            if(size==0){
+                depth++;
+                size=queue.size();
+            }
+        }
+        return 0;
+    }
 ```
 
 
@@ -742,6 +976,35 @@ class Solution {
 }
 ```
 
+#### [337. 打家劫舍 III](https://leetcode-cn.com/problems/house-robber-iii/)
+
+暴力解法
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public int rob(TreeNode root) {
+        if(root==null) return 0;
+        int val =root.val;
+        if(root.left!=null){
+            val+=(rob(root.left.left)+rob(root.left.right));
+        }
+        if(root.right!=null){
+            val+=(rob(root.right.left)+rob(root.right.right));
+        }
+        return Math.max(val,rob(root.left)+rob(root.right));
+    }
+}
+```
+
 
 
 ### 剑指Offer
@@ -862,7 +1125,7 @@ class Solution {
 
 ### 集合
 
-#### HashMap
+#### HashMap（没写完）
 
 数组+链表实现的，链表的出现是为了解决hash冲突。HashMap初始化的时候，Entry数组不会实例化，在第一次进行put操作的时候初始化数组。
 
@@ -1046,7 +1309,7 @@ jstack可以定位哪些问题？ <https://www.cnblogs.com/chenpi/p/5377445.html
 
 ## IO
 
-#### Netty
+### Netty
 
 三个优点：
 
@@ -1054,7 +1317,7 @@ jstack可以定位哪些问题？ <https://www.cnblogs.com/chenpi/p/5377445.html
 2. 传输快，传输基于零拷贝实现，减少不必要的内存拷贝，传输效率高
 3. 封装好，封装了NIO的很多操作细节，提供了易用的接口调用
 
-##### Netty的零拷贝
+#### Netty的零拷贝
 
 **传统意义的零拷贝**
 
@@ -1188,7 +1451,7 @@ select n , sc from (select avg(score) as sc,name as n from tb group by n having 
 
 buffer pool中的缓存页大小为16KB，每个缓存页都包含控制信息，
 
-### join的执行过程
+### join的执行过程（未完成）
 
 
 
@@ -1237,17 +1500,63 @@ netstat -anp | grep 端口号
 
 ## 操作系统
 
+这部分建议微信公众号搜 小林coding 。有文章讲解特别详细。
+
 虚拟内存和物理内存的映射关系和工作原理：
 
 <https://blog.csdn.net/don_chiang709/article/details/89087709>
 
-#### 进程通信：
+#### 虚拟地址技术、分页、分段
+
+虚拟地址技术解决了各个进程同时运行时对物理内存的访问冲突，为每个进程单独分配一套独立的虚拟地址，映射到不同的物理内存，实现了进程之间的内存隔离。通过MMU 内存管理单元实现的虚拟地址到物理地址的映射。
+
+内存管理的方式：分段、分页。
+
+
+
+程序是若干个逻辑分段组成的----代码段，数据段，栈段，堆段等。不同的段属性不同，所以要进行分段管理。分段机制下虚拟地址主要分为两部分----段选择子（段号和标志位）和段内偏移量，根据段表可以找对应的物理地址。
+
+分段管理存在的问题：内存碎片和内存交换的效率低。
+
+为了解决这个问题，提出分页管理机制。分页是把整个虚拟和物理内存空间切成一段段固定尺寸的大小----页，两者通过页表进行映射。Linux页的大小4k，消除了内存外碎片，提高了内存使用率，同时内存交换的效率相对较高。
+
+
+
+**两者的区别：**
+
+1. 页是信息物理单位，主要是为了实现内存离散分配，解决外碎片，提高内存的利用率。而段是信息的逻辑单位，含有一组意义相对完整的信息，是为了更好的满足用户需求。
+2. 页大小固定，由系统确定，逻辑地址=页号+页内地址。段大小不固定，取决于用户编写的程序。
+3. 分页的作业地址空间是一维的，分段是二维的，再标识一个地址时候，需要段名+段内地址。
+
+
+
+#### 进程通信
 
 1. 信号
 
    进程通过信号进行通信，用于用纸接受进程的某个事件已经发生。如kill -9 pid 就是向pid进程发起结束进程的信号
 
-2. 管道。有名管道和匿名管道。匿名管道用于 父子进程的通信，而有名管道用于 无亲缘关系的进程通信，
+2. 管道。内核中的一串缓存，分为有名管道和匿名管道。匿名管道用于父子进程的通信，而有名管道用于无亲缘关系的进程通信。常用的ps -aux|grep pid中的竖杠就是匿名管道。但是管道中的数据是无格式的流。
+
+3. 消息队列。消息队列是存在内核中的一个消息链表结构，进程可以生产消息添加到链表也可以消费消息，消费后的消息会从链表中移除，链表消息的结构体是由用户自定义的。但是消息队列通信过程中，存在用户态和内核态的数据拷贝开销，不适合大数据传输。
+
+4. 共享内存。通过将不同进程的虚拟地址映射到同一块内存区域，实现进程之间的共享，不用再进行内核态和用户态的拷贝。
+
+5. 信号量。整型的计数器，不是用来缓存进程间通信的数据，而是用于控制进程之间的同步和互斥。通过P,V操作来控制进程的同步和互斥。
+
+6. 信号。是进程间唯一的异步通信机制。可通过kill -l查看所有信号。信号包括硬件来源和软件来源，硬件来源如ctrl+c（产生SIGINT信号，终止进程），软件来源如kill -9 pid（产生SIGKILL信号，立即结束进程）。
+
+7. Socket。用于不同主机的进程之间的通信。
+
+#### 进程调度算法
+
+1. 先来先服务   短进程响应时间过长
+2. 短任务优先    长进程会产生饥饿现象
+3. 高响应比优先   综合考虑等待时间和要求服务时间。 响应比=（等待时间+要求服务时间）/要求服务时间
+4. 时间片轮转    
+5. 短作业有限
+6. 最短剩余时间优先
+7. ​
 
 ## 计算机网络
 
@@ -1395,12 +1704,12 @@ ping是基于ICMP协议工作的，参考文章
 
 作用：解耦、异步、削峰
 
-**如何防止重复消费？**
+#### **如何防止重复消费？**
 
 1. 同步提交，会有性能影响。
 2. 消息使用唯一id标识-->落表（主键或者唯一索引避免重复）或者选择唯一主键存储到redis，若存在则不处理，不存在则插入后处理。
 
-**如何防止消息丢失？**
+#### **如何防止消息丢失？**
 
 1. 生产者丢失-->使用producer.send(msg,callback)回调机制获取消息是否发送成功，未成功则重试。
 2. 消费者丢失-->先消费消息，再更新offset。防止offset更新没有消费完成导致丢失。
