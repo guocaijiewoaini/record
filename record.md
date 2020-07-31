@@ -54,6 +54,10 @@ ICMP  PING
 
 模拟用户手机号 **17021312166**
 
+用户id 5124103437373412396
+
+波段号 13418335
+
 进入主播中心页面时，需要再次登录，这时要在debug设置中关闭实名认证，不然登录完会再次跳转到登录页面
 
 ### 2020.7.28
@@ -92,7 +96,17 @@ Map保存元素和索引，while循环一直找Map中存在等于当前值的数
 
 leetcode 337 11 111
 
+### 2020.7.31
 
+运营后台发布兑换商品，消费钻石兑换商品，后台审核通过发送kafka消息。
+
+消费钻石的kafka消息
+
+msg: v_dianbo_mission!%#clientIp:192.168.18.106,producerIp:172.18.20.23,bizEnv:lizhi!%#{"diamondCount":10,"recordType":1,"time":1596181279985,"userId":5124103437373412396
+
+leetcode刷题 
+
+线程池    bean生命周期
 
 ## 面经收集
 
@@ -406,6 +420,36 @@ public class Solution {
 
 ### leetcode
 
+#### [5. 最长回文子串](https://leetcode-cn.com/problems/longest-palindromic-substring/)
+
+```java
+class Solution {
+    public String longestPalindrome(String s) {
+        if(s==null||s.length()==0) return s;
+        int n =s.length();
+        char[] a =s.toCharArray();
+        boolean[][] dp =new boolean[n][n];
+        int len=1;//回文串长度
+        int start=0;//回文串起始位置
+        for(int j=1;j<n;j++){
+            for(int i=0;i<j;i++){
+                if(a[i]==a[j]&&(j-i<3||dp[i+1][j-1])){
+                    dp[i][j]=true;
+                    if(j-i+1>len){
+                        len=j-i+1;
+                        start=i;
+                    }
+                }
+
+            }
+        }
+        return s.substring(start,start+len);
+    }
+}
+```
+
+### 
+
 #### [11. 盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water/)
 
 双指针法，一前一后向内移动，每次移动高度小的指针。
@@ -431,6 +475,42 @@ class Solution {
 
 
 #### K链表翻转
+
+#### [33. 搜索旋转排序数组](https://leetcode-cn.com/problems/search-in-rotated-sorted-array/)
+
+看题解，讲得很详细。<https://leetcode-cn.com/problems/search-in-rotated-sorted-array/solution/sou-suo-xuan-zhuan-pai-xu-shu-zu-by-leetcode-solut/>
+
+```java
+class Solution {
+    public int search(int[] nums, int target) {
+        int n=nums.length;
+        if(n==0) return -1;
+        if(n==1) return nums[0]==target?0:-1;
+        int l=0,r=n-1;
+        
+        while(l<=r){
+            int mid = (l+r)/2;
+            if(nums[mid]==target) return mid;
+            if(nums[mid]>=nums[0]){//左边有序 右边无序  然后判断target在不在里面
+                if(nums[0]<=target&&target<nums[mid]){
+                    r=mid-1;
+                }else{
+                    l=mid+1;
+                }
+            }else{
+                if(nums[mid]<target&&target<=nums[n-1]){
+                    l=mid+1;
+                }else{
+                    r=mid-1;
+                }
+            }
+        }
+        return -1;
+    }
+}
+```
+
+
 
 #### 39 组合总和
 
@@ -1005,7 +1085,89 @@ class Solution {
 }
 ```
 
+#### [516. 最长回文子序列](https://leetcode-cn.com/problems/longest-palindromic-subsequence/)
 
+与第5题对应。dp公式好理解，遍历的顺序难理解，理解dp是一个很难的过程。这里的dp从底下开始网上遍历。
+
+```java
+class Solution {
+    public int longestPalindromeSubseq(String s) {
+        int n =s.length();
+        if(n==0) return 0;
+        char[] a =s.toCharArray();
+        int[][] dp =new int[n][n];
+        for(int i=0;i<n;i++) dp[i][i]=1;
+        for(int i=n-1;i>=0;i--){
+            for(int j=i+1;j<n;j++){
+                if(a[i]==a[j]){
+                    dp[i][j]=dp[i+1][j-1]+2;
+                }
+                else{
+                    dp[i][j]=Math.max(dp[i+1][j],dp[i][j-1]);
+                }
+            }
+        }
+        return dp[0][n-1];
+    }
+}
+```
+
+#### [919. 完全二叉树插入器](https://leetcode-cn.com/problems/complete-binary-tree-inserter/)
+
+在初始化的时候，保存根节点，通过queue和deque遍历节点，所有叶子节点存储到deque中。
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class CBTInserter {
+    TreeNode root;
+    Deque<TreeNode> deque;
+    public CBTInserter(TreeNode root) {
+        this.root =root;
+        Queue<TreeNode> queue = new LinkedList<>();
+        deque = new LinkedList<>();
+        queue.add(root);
+        while(!queue.isEmpty()){
+            TreeNode t =queue.poll();
+            if(t.left==null||t.right==null) deque.addLast(t);//收集叶子节点
+            if(t.left!=null) queue.add(t.left);
+            if(t.right!=null) queue.add(t.right);
+        }
+    }
+    
+    public int insert(int v) {
+        TreeNode t =deque.peekFirst();
+        TreeNode n =new TreeNode(v);
+        deque.addLast(n);
+        if(t.left==null){
+            t.left =n;
+        }
+        else{
+            t.right=n;
+            deque.pollFirst();
+        }
+        return t.val;
+    }
+    
+    public TreeNode get_root() {
+        return root;
+    }
+}
+
+/**
+ * Your CBTInserter object will be instantiated and called as such:
+ * CBTInserter obj = new CBTInserter(root);
+ * int param_1 = obj.insert(v);
+ * TreeNode param_2 = obj.get_root();
+ */
+```
 
 ### 剑指Offer
 
@@ -1665,7 +1827,51 @@ ping是基于ICMP协议工作的，参考文章
 3.收到arp响应包之后，获得某个IP对应的具体mac地址，有了物理地址之后才可以开始通信了,同时对ip-mac地址做一个本地cache
 4.发出icmp echo request包，收到icmp  echo reply包
 
-## 中间件
+## 中间件和框架
+
+### Spring
+
+#### Bean生命周期
+
+参考：<https://www.jianshu.com/p/38032b0b9869>
+
+1. 实例化Bean对象。createBeanInstance()
+
+2. 为Bean设置相关的属性和依赖。populateBean()
+
+3. 初始化，包括检查Aware 接口的依赖注入、BeanPostProcessor 在初始化前后的处理以及 InitializingBean 和 init-method 的初始化操作。initializeBean()
+
+4. 销毁，检查Destruction相关回调接口、是否实现DisposableBean接口、是否配置自定义的destory-method。registerDisposableBeanIfNecessary()
+
+   ```java
+   // AbstractAutowireCapableBeanFactory.java
+   protected Object doCreateBean(final String beanName, final RootBeanDefinition mbd, final @Nullable Object[] args)
+       throws BeanCreationException {
+
+       // 1\. 实例化
+       BeanWrapper instanceWrapper = null;
+       if (instanceWrapper == null) {
+           instanceWrapper = createBeanInstance(beanName, mbd, args);
+       }
+
+       Object exposedObject = bean;
+       try {
+           // 2\. 属性赋值
+           populateBean(beanName, mbd, instanceWrapper);
+           // 3\. 初始化
+           exposedObject = initializeBean(beanName, exposedObject, mbd);
+       }
+
+       // 4\. 销毁-注册回调接口
+       try {
+           registerDisposableBeanIfNecessary(beanName, bean, mbd);
+       }
+
+       return exposedObject;
+   }
+   ```
+
+   ​
 
 ### Redis
 
