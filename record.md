@@ -689,7 +689,7 @@ class Solution {
 
 #### [92. 反转链表 II](https://leetcode-cn.com/problems/reverse-linked-list-ii/)
 
-勉强通过版本。想法是取出中间链表单独反转，然后在放回到原链表。
+头插法。
 
 ```java
 /**
@@ -702,51 +702,28 @@ class Solution {
  */
 class Solution {
     public ListNode reverseBetween(ListNode head, int m, int n) {
-        
-        ListNode mNode=head;
-        ListNode nNode=head;
-        ListNode t1=null;
-        ListNode t2=null;
-        while(m>1){
-            t1=mNode;//中间链表头节点的前一个节点
-            mNode=mNode.next;
-            nNode=nNode.next;
+        ListNode dumb = new ListNode(0);
+        dumb.next=head;
+        ListNode pre =dumb;
+        ListNode node =dumb;
+
+        while(m>0){
+            pre=node;
+            node=node.next;
+            n--;
             m--;
+        }
+        //pre是中间链表表头的前一个节点
+        ListNode removed;
+        while(n>0){
+            removed=node.next;
+            node.next=node.next.next；
+            
+            removed.next =pre.next;
+            pre.next=removed;
             n--;
         }
-
-        while(n>1){
-            nNode =nNode.next;
-            n--;
-        }
-        if(nNode!=null) t2=nNode.next;//中间链表尾节点的后一个节点
-        nNode.next=null;
-
-        //反转中间链表
-        ListNode[] list =reverseList(mNode);
-        list[1].next=t2;
-        if(t1!=null){
-            t1.next=list[0];
-            return head;
-        }else{
-            return list[0];
-        }
-        
-        // return head;
-
-    }
-    public ListNode[] reverseList(ListNode h) {
-        ListNode t1 =null;
-        ListNode t2=h;
-        // if(t2==null) return t2;
-        
-        while(t2!=null){
-            ListNode tmp =t2.next;
-            t2.next =t1;
-            t1=t2;
-            t2=tmp;
-        }
-        return new ListNode[]{t1,h};
+        return dumb.next;
     }
 }
 ```
