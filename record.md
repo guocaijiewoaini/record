@@ -108,6 +108,14 @@ leetcode刷题
 
 线程池    bean生命周期
 
+
+
+value = common!%#clientIp:172.18.10.218,producerIp:172.18.10.218,bizEnv:lizhi!%#{"clientVersion":147680,"deviceId":"N_61ceb8e6dfe53213","incrCount":1,"ip":"192.168.10.34","platform":"Android 29","playType":0,"source":"","uid":5124103437373412396,"voiceId":2499935976722270214,"voiceUserId":2571481447246544428})
+
+
+
+6D  7B  8xx 9C 10B
+
 ## 面经收集
 
 ### 智力题
@@ -679,6 +687,76 @@ class Solution {
 }
 ```
 
+#### [92. 反转链表 II](https://leetcode-cn.com/problems/reverse-linked-list-ii/)
+
+勉强通过版本。想法是取出中间链表单独反转，然后在放回到原链表。
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public ListNode reverseBetween(ListNode head, int m, int n) {
+        
+        ListNode mNode=head;
+        ListNode nNode=head;
+        ListNode t1=null;
+        ListNode t2=null;
+        while(m>1){
+            t1=mNode;//中间链表头节点的前一个节点
+            mNode=mNode.next;
+            nNode=nNode.next;
+            m--;
+            n--;
+        }
+
+        while(n>1){
+            nNode =nNode.next;
+            n--;
+        }
+        if(nNode!=null) t2=nNode.next;//中间链表尾节点的后一个节点
+        nNode.next=null;
+
+        //反转中间链表
+        ListNode[] list =reverseList(mNode);
+        list[1].next=t2;
+        if(t1!=null){
+            t1.next=list[0];
+            return head;
+        }else{
+            return list[0];
+        }
+        
+        // return head;
+
+    }
+    public ListNode[] reverseList(ListNode h) {
+        ListNode t1 =null;
+        ListNode t2=h;
+        // if(t2==null) return t2;
+        
+        while(t2!=null){
+            ListNode tmp =t2.next;
+            t2.next =t1;
+            t1=t2;
+            t2=tmp;
+        }
+        return new ListNode[]{t1,h};
+    }
+}
+```
+
+使用头插法。
+
+
+
+
+
 #### [94. 二叉树的中序遍历](https://leetcode-cn.com/problems/binary-tree-inorder-traversal/)
 
 非递归，借助栈。stack先push左子节点，直到为空，此时取出栈顶的第一个节点tmp，再做前面的操作......当栈为空并且tmp为空时退出循环。
@@ -822,6 +900,72 @@ class Solution {
     }
 }
 ```
+
+#### [146. LRU缓存机制](https://leetcode-cn.com/problems/lru-cache/)
+
+面试场考题目。其中链表可以使用LinkedList，也可以自己实现一个双向链表。使用LinkedList精简版代码如下。
+
+```java
+class LRUCache {
+    HashMap<Integer,Node> map =new HashMap<>();
+    LinkedList<Node> list =new LinkedList<>();
+    int capacity;
+    public LRUCache(int capacity) {
+        this.capacity=capacity;
+    }
+    
+    public int get(int key) {
+        if(map.containsKey(key)){
+            Node n =map.get(key);
+            //移动节点到链表头部
+            list.remove(n);
+            list.addFirst(n);
+            return n.value;
+        }
+        return -1;
+    }
+    
+    public void put(int key, int value) {
+        //检查是否已经存在key
+        if(map.containsKey(key)){
+            //存在 移动到头部
+            Node n =map.get(key);
+            n.value=value;
+            list.remove(n);
+            list.addFirst(n);
+            map.put(key,n);
+        }else {
+            if(map.size()==capacity){  //不存在 检查容量是否够
+                //丢掉最后一个节点
+                Node r =list.removeLast();
+                map.remove(r.key);
+            }
+            Node n =new Node(key,value);
+            list.addFirst(n);
+            map.put(key,n);
+        }
+    }
+}
+
+class Node{
+    int key;
+    int value;
+    public Node(int key, int value){
+        this.key=key;
+        this.value=value;
+    }
+    
+}
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache obj = new LRUCache(capacity);
+ * int param_1 = obj.get(key);
+ * obj.put(key,value);
+ */
+```
+
+
 
 #### [208. 实现 Trie (前缀树)](https://leetcode-cn.com/problems/implement-trie-prefix-tree/)
 
@@ -1019,6 +1163,10 @@ class Solution {
 }
 ```
 
+#### 252.会议室（没做）
+
+#### 253.会议室2（没做）
+
 #### [283. 移动零](https://leetcode-cn.com/problems/move-zeroes/)
 
 双指针，各自遍历一次。
@@ -1108,6 +1256,37 @@ class Solution {
             }
         }
         return dp[0][n-1];
+    }
+}
+```
+
+#### [540. 有序数组中的单一元素](https://leetcode-cn.com/problems/single-element-in-a-sorted-array/)
+
+log(n)时间复杂度需要二分法。解题关键是找到mid，看哪边长度是奇数，则目标数肯定在那边，否则在另一边。
+
+```java
+class Solution {
+    public int singleNonDuplicate(int[] nums) {
+        int l =0,r =nums.length-1;
+        while(l<r){
+            int mid =(l+r)/2;
+            if(nums[mid]==nums[mid+1]){
+                if((mid-l)%2==0){//左边为偶数个数 搜索右边
+                    l=mid+2;
+                }else{
+                    r=mid-1;
+                }
+            }else if(nums[mid]==nums[mid-1]){
+                if((mid-l)%2==0){//左边为奇数个数 搜索左边
+                    r=mid-2;
+                }else{
+                    l=mid+1;
+                }
+            }else{
+                return nums[mid];
+            }
+        }
+        return nums[l];
     }
 }
 ```
@@ -1588,6 +1767,16 @@ InnoDB是聚集索引，使用B+树作为索引结构，数据文件和（主键
 ```SQL
 select n , sc from (select avg(score) as sc,name as n from tb group by n having sc>85 ) 
 ```
+
+### drop、truncate、delete区别
+
+1. delete是每次从表中删除一行，并且同时将改行的删除操作作为事务记录在日志中以便回滚。
+2. truncate 一次性删除表中所有的数据并不记录日志，无法恢复，但是保存表的结构。删除过程不会激活触发器，速度快。
+3. drop将表锁占用的空间全释放掉。
+
+### 触发器
+
+触发器是与表有关的数据库对象，在满足定义条件时触发，并执行触发器中定义的语句集合。
 
 ### 联合索引
 
