@@ -424,6 +424,49 @@ public class Solution {
 }
 ```
 
+#### 堆排序
+
+常考题。leetcode 215 题解就是堆排序稍微变动一下。
+
+```java
+public void heapSort(int[] nums){
+        int n =nums.length;
+        buildHeap(nums,n);
+        for(int i=n-1;i>=0;i--){
+            swap(nums,0,i);
+            heapfiy(nums,i,0);
+        }
+    }
+
+public void buildHeap(int[] nums, int n){
+    for(int i=n/2-1;i>=0;i--){
+        heapfiy(nums,n,i);
+    }
+}
+
+//堆化
+public void heapfiy(int[] nums ,int n ,int parent){
+    if(parent>=n) return;
+    int l =2*parent+1;int r =2*parent+2;
+    int max=parent;
+    if(l<n&&nums[l]>nums[max]) max=l;
+    if(r<n&&nums[r]>nums[max]) max=r;
+    if(max!=parent){
+        swap(nums,max,parent);
+        heapfiy(nums,n,max);
+    }
+}
+public void swap(int[] nums,int i, int j){
+    int tmp=nums[j];
+    nums[j]=nums[i];
+    nums[i]=tmp;
+}
+```
+
+
+
+
+
 
 
 ### leetcode
@@ -482,7 +525,102 @@ class Solution {
 
 
 
-#### K链表翻转
+#### [25. K 个一组翻转链表](https://leetcode-cn.com/problems/reverse-nodes-in-k-group/)
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public ListNode reverseKGroup(ListNode head, int k) {
+        ListNode dumb =new ListNode(0);
+        dumb.next=head;
+
+        ListNode pre =dumb;
+        ListNode end =dumb;//子链表的尾
+        while(end!=null){
+            for(int i=0;i<k;i++){
+                end=end.next;
+                if(end==null) return dumb.next;
+            }
+            ListNode start =pre.next;//子链表的头
+            ListNode nex=end.next;//记录链表尾部的下一个节点
+            end.next=null;//子链表尾部置空，方便下一行的反转
+            pre.next =reverseListNode(start);//反转子链表 pre.next =子链表的新头节点
+            start.next=nex;//原来start是子链表头，现在是子链表的尾
+
+            //移动pre和end
+            pre=start;
+            end=pre;
+        }
+        return dumb.next;
+
+    }
+    public ListNode reverseListNode(ListNode head) {
+        ListNode cur =null;
+        ListNode h=head; 
+        ListNode tmp;
+        while(h!=null){
+            tmp = h.next;
+            h.next=cur;
+            
+            cur =h;
+            h=tmp;
+        }
+        //此时 cur是头节点 
+        return cur;
+    }
+}
+```
+
+
+
+#### [31. 下一个排列](https://leetcode-cn.com/problems/next-permutation/)
+
+```java
+class Solution {
+    public void nextPermutation(int[] nums) {
+        int n =nums.length-1;
+        //从后往前找到第一个不满足降序排列的元素
+        int i=n-1;
+        while(i>=0&&nums[i]>=nums[i+1]){
+            i--;
+        }
+        if(i<0){
+            reverseArray(nums);
+            return;
+        }
+        int j=n;
+        //从i+1往后找到大于nums[i]的最小的数
+        while(j>=0&&nums[j]<=nums[i]){
+            j--;
+        }
+        swap(nums,i,j);
+        Arrays.sort(nums,i+1,n+1);
+        
+    }
+    public void reverseArray(int[] nums){
+        int i =0;
+        int j=nums.length-1;
+        while(i<j){
+            swap(nums,i,j);
+            i++;j--;
+        }
+    }
+    public void swap(int[] nums,int i, int j){
+        int tmp=nums[j];
+        nums[j]=nums[i];
+        nums[i]=tmp;
+    }
+}
+```
+
+
 
 #### [33. 搜索旋转排序数组](https://leetcode-cn.com/problems/search-in-rotated-sorted-array/)
 
@@ -942,6 +1080,53 @@ class Node{
  */
 ```
 
+#### [215. 数组中的第K个最大元素](https://leetcode-cn.com/problems/kth-largest-element-in-an-array/)
+
+堆排序求解！
+
+```java
+class Solution {
+    public int findKthLargest(int[] nums, int k) {
+        //堆排序
+        heapSort(nums,k);
+        return nums[nums.length-k]; 
+    }
+    public void heapSort(int[] nums,int k){
+        int n =nums.length;
+        buildHeap(nums,n);
+        for(int i=n-1;i>=n-k;i--){
+            swap(nums,0,i);
+            heapfiy(nums,i,0);
+        }
+    }
+
+    public void buildHeap(int[] nums, int n){
+        for(int i=n/2-1;i>=0;i--){
+            heapfiy(nums,n,i);
+        }
+    }
+
+    //堆化
+    public void heapfiy(int[] nums ,int n ,int parent){
+        if(parent>=n) return;
+        int l =2*parent+1;int r =2*parent+2;
+        int max=parent;
+        if(l<n&&nums[l]>nums[max]) max=l;
+        if(r<n&&nums[r]>nums[max]) max=r;
+        if(max!=parent){
+            swap(nums,max,parent);
+            heapfiy(nums,n,max);
+        }
+    }
+    public void swap(int[] nums,int i, int j){
+        int tmp=nums[j];
+        nums[j]=nums[i];
+        nums[i]=tmp;
+    }
+
+}
+```
+
 
 
 #### [208. 实现 Trie (前缀树)](https://leetcode-cn.com/problems/implement-trie-prefix-tree/)
@@ -1140,9 +1325,13 @@ class Solution {
 }
 ```
 
-#### 252.会议室（没做）
+#### 252.会议室
 
-#### 253.会议室2（没做）
+按开始时间进行排序，判断数组中当前元素开始时间是否小于前一个结束时间，是则cnt++，否则继续循环。
+
+#### 253.会议室2
+
+<https://blog.csdn.net/qinian_ztc/article/details/105257168>
 
 #### [283. 移动零](https://leetcode-cn.com/problems/move-zeroes/)
 
