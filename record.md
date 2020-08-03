@@ -112,9 +112,19 @@ leetcode刷题
 
 value = common!%#clientIp:172.18.10.218,producerIp:172.18.10.218,bizEnv:lizhi!%#{"clientVersion":147680,"deviceId":"N_61ceb8e6dfe53213","incrCount":1,"ip":"192.168.10.34","platform":"Android 29","playType":0,"source":"","uid":5124103437373412396,"voiceId":2499935976722270214,"voiceUserId":2571481447246544428})
 
+### 2020.8.2
 
+主播任务系统条件
 
-6D  7B  8xx 9C 10B
+预发上线的项目： 
+
+​	lz_vod_anchor_center_pre
+
+​	lz_voice_pre
+
+​	lz_vod_comment_pre
+
+git fetch和pull详解 <https://www.cnblogs.com/runnerjack/p/9342362.html>
 
 ## 面经收集
 
@@ -165,6 +175,10 @@ dns具体讲讲
 <https://www.nowcoder.com/discuss/426600?toCommentId=6170066>
 
 ## 算法+数据结构
+
+### IP地址和字符串互转
+
+参考<https://blog.csdn.net/zhao_liwei/article/details/51853434>
 
 ### 生产者消费者模型代码
 
@@ -684,6 +698,32 @@ class Solution {
             dfs(arr,n,i,sum-arr[i],list,deque);
             deque.removeLast();
         }
+    }
+}
+```
+
+#### [41. 缺失的第一个正数](https://leetcode-cn.com/problems/first-missing-positive/)
+
+```java
+class Solution {
+    public int firstMissingPositive(int[] nums) {
+        int n=nums.length;
+        
+        for(int i=0;i<n;i++){
+            if(nums[i]<=0){
+                nums[i]=n+1;
+            }
+        }
+        for(int i=0;i<n;i++){
+            int index =Math.abs(nums[i])-1;
+            if(index<n) nums[index]=-Math.abs(nums[index]);
+        }
+        for(int i=0;i<n;i++){
+            if(nums[i]>0){
+                return i+1;
+            }
+        }
+        return n+1;
     }
 }
 ```
@@ -1457,6 +1497,37 @@ class Solution {
 }
 ```
 
+#### [543. 二叉树的直径](https://leetcode-cn.com/problems/diameter-of-binary-tree/)
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    int ans=1;
+    public int diameterOfBinaryTree(TreeNode root) {
+        if(root==null) return 0;
+        helper(root);
+        return ans-1;
+    }
+    public int helper(TreeNode root){
+        if(root==null) return 0;
+        int left =helper(root.left);
+        int right =helper(root.right);
+        ans = Math.max(ans,left+right+1);
+        return Math.max(left,right)+1;
+    }
+}
+```
+
+
+
 #### [919. 完全二叉树插入器](https://leetcode-cn.com/problems/complete-binary-tree-inserter/)
 
 在初始化的时候，保存根节点，通过queue和deque遍历节点，所有叶子节点存储到deque中。
@@ -1746,6 +1817,16 @@ public class Singleton2 {
 
 ## JVM
 
+### 锁
+
+#### Synchronized
+
+参考：<https://baijiahao.baidu.com/s?id=1654344500475304827&wfr=spider&for=pc>
+
+偏向锁：大多数情况，锁不存在多线程竞争。为了减少获得锁的代价，引入。线程获取锁的时候会把线程的id存储在对象头的MarkWord和栈帧锁记录中，这样再次获取锁只要测试MarkWord是否存储着当前线程id是否一致即可。如果测试不成功，测试MarkWord中的偏向锁标识是否为1，为1则用CAS获取，不为1则尝试使用CAS将对象头的偏向锁指向当前线程。
+
+轻量级锁：把MarkWord复制到栈帧中存储，同时CAS替换MarkWork为指向对应栈帧的指针，替换成功获取锁，失败则自旋，自旋一定次数后升级到重量级锁。
+
 ### 运行时数据区
 
 1. 堆：存储对象实例和数组
@@ -1925,6 +2006,10 @@ InnoDB是聚集索引，使用B+树作为索引结构，数据文件和（主键
     undo log
     redo log
 ```
+
+### count(1)和count(*)
+
+参考：<https://www.cnblogs.com/vandusty/p/12248605.html>
 
 ### SQL题
 
