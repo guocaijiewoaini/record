@@ -1,5 +1,19 @@
  -Dvtag=v_vod_material_ztc
 
+## 软件下载地址
+
+### mysql:
+
+中科大镜像 <http://mirrors.ustc.edu.cn/mysql-ftp/Downloads/MySQL-8.0/mysql-8.0.16-winx64.zip>
+
+搜狐镜像 <http://mirrors.sohu.com/mysql/MySQL-8.0/>
+
+### python:
+
+淘宝镜像 <http://npm.taobao.org/mirrors/python>
+
+
+
 
 
 面经参考<https://troywu0.gitbooks.io/interview/content/>
@@ -175,6 +189,10 @@ dns具体讲讲
 <https://www.nowcoder.com/discuss/426600?toCommentId=6170066>
 
 ## 算法+数据结构
+
+### 高效判断一个数是否素数
+
+<https://blog.csdn.net/qq_33945246/article/details/103045738>
 
 ### IP地址和字符串互转
 
@@ -533,6 +551,44 @@ class Solution {
             }
         }
         return s;
+    }
+}
+```
+
+#### [15. 三数之和](https://leetcode-cn.com/problems/3sum/)
+
+```java
+class Solution {
+    public List<List<Integer>> threeSum(int[] nums) {
+        int n =nums.length;
+        Arrays.sort(nums);
+        List<List<Integer>> list =new ArrayList<>();
+        for(int first=0;first<n;first++){
+            if(first>0&&nums[first]==nums[first-1]) continue;
+            int third =n-1;
+            int target =-nums[first];
+
+            for(int second =first+1;second<third;second++){
+                if(second>first+1&&nums[second]==nums[second-1]) continue;
+
+                while(third>second&&nums[third]+nums[second]>target){
+                    third--;
+                }
+                if (second == third) {
+                    break;
+                }
+                if(nums[second]+nums[third]==target){
+                    ArrayList<Integer> itList =new ArrayList<>();
+                    itList.add(nums[first]);
+                    itList.add(nums[second]);
+                    itList.add(nums[third]);
+                    list.add(itList);
+                }
+
+            }
+
+        }
+        return list;
     }
 }
 ```
@@ -1626,9 +1682,86 @@ class Solution {
 }
 ```
 
+#### [剑指 Offer 48. 最长不含重复字符的子字符串](https://leetcode-cn.com/problems/zui-chang-bu-han-zhong-fu-zi-fu-de-zi-zi-fu-chuan-lcof/)
+
 
 
 #### [剑指 Offer 51. 数组中的逆序对](#Offer51)
+
+滑动窗口，空间复杂度O(1)，时间复杂度O(n2)
+
+```java
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        if(s==null||s.length()==0) return 0;
+        //滑动窗口
+        int max =1;
+        int i=0;
+        for(int j=0;j<s.length();j++){
+            for(int k=i;k<j;k++){
+                if(s.charAt(k)==s.charAt(j)){
+                    //移动左指针
+                    i=k+1;
+                    break;
+                }
+            }
+            max =Math.max(max,j-i+1);
+        }
+        return max;
+    }
+}
+```
+
+滑动窗口+map，空间O(n)，时间O(n)
+
+```java
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        if(s==null||s.length()==0) return 0;
+        //滑动窗口
+        int max =1;
+        int i=0;
+        HashMap<Character,Integer> map =new HashMap<>();
+        for(int j=0;j<s.length();j++){
+            if(map.containsKey(s.charAt(j))){
+                i=Math.max(map.get(s.charAt(j))+1,i);
+            }
+            max =Math.max(max,j-i+1);
+            map.put(s.charAt(j),j);
+        }
+        return max;
+    }
+}
+```
+
+#### [剑指 Offer 67. 把字符串转换成整数](https://leetcode-cn.com/problems/ba-zi-fu-chuan-zhuan-huan-cheng-zheng-shu-lcof/)
+
+```java
+class Solution {
+    public int strToInt(String str) {
+        str =str.trim().strip();
+        if(str==null||str.length()==0) return 0;
+        boolean flag=true;
+        int bd =Integer.MAX_VALUE/10;
+        // int k=Integer.MAX_VALUE%10;
+
+        int sum=0;
+        int i=1;//移动i
+        if(str.charAt(0)=='-') {
+            flag=false;//负数
+        }
+        else if(str.charAt(0)!='+') i=0;
+
+        for(int k=i;k<str.length();k++){
+            char c =str.charAt(k);
+            if(c<'0'||c>'9') break;
+            if(sum>bd||sum==bd&&str.charAt(k)>'7') return flag?Integer.MAX_VALUE:Integer.MIN_VALUE; 
+            sum=10*sum+(c-'0');
+        }
+        return flag?sum:-sum;
+    }
+}
+```
 
 
 
