@@ -194,6 +194,14 @@ dns具体讲讲
 
 <https://blog.csdn.net/qq_33945246/article/details/103045738>
 
+关键是掌握质数分布的规律：大于等于 5 的质数一定和 6 的倍数相邻。例如 5 和 7，11 和 13,17 和 19 等等；
+
+证明：令 x≥1，将大于等于 5 的自然数表示如下：
+······ 6x-1，6x，6x+1，6x+2，6x+3，6x+4，6x+5，6(x+1），6(x+1)+1 ······
+可以看到，不在 6 的倍数两侧，即 6x 两侧的数为 6x+2，6x+3，6x+4，由于 2 (3x+1)，3 (2x+1)，2 (3x+2)，所以它们一定不是素数，再除去 6x 本身，显然，素数要出现只可能出现在 6x 的相邻两侧。
+
+所以循环的步长可以设为 6，然后每次只判断 6 两侧的数即可。
+
 ### IP地址和字符串互转
 
 参考<https://blog.csdn.net/zhao_liwei/article/details/51853434>
@@ -1466,6 +1474,31 @@ class Solution {
 }
 ```
 
+#### [322. 零钱兑换](https://leetcode-cn.com/problems/coin-change/)
+
+自顶向下---dfs，自底向上--动态规划。dp[0]=0很巧妙，这样当i=coins[j]时，dp[i-coin]+1=1表示使用coin一次。
+
+```java
+class Solution {
+    public int coinChange(int[] coins, int amount) {
+        int[] dp =new int[amount+1];
+        Arrays.fill(dp,amount+1);
+        dp[0]=0;
+        
+        for(int i=1;i<=amount;i++){
+            for(int j=0;j<coins.length;j++){
+                if(coins[j]<=i){
+                    dp[i]=Math.min(dp[i],dp[i-coins[j]]+1);
+                }
+            }
+        }
+        return dp[amount]>amount?-1:dp[amount];
+    }
+}
+```
+
+
+
 #### [337. 打家劫舍 III](https://leetcode-cn.com/problems/house-robber-iii/)
 
 暴力解法
@@ -1686,7 +1719,7 @@ class Solution {
 
 
 
-#### [剑指 Offer 51. 数组中的逆序对](#Offer51)
+#### 
 
 滑动窗口，空间复杂度O(1)，时间复杂度O(n2)
 
@@ -1733,6 +1766,10 @@ class Solution {
     }
 }
 ```
+
+[剑指 Offer 51. 数组中的逆序对](#Offer51)
+
+
 
 #### [剑指 Offer 67. 把字符串转换成整数](https://leetcode-cn.com/problems/ba-zi-fu-chuan-zhuan-huan-cheng-zheng-shu-lcof/)
 
