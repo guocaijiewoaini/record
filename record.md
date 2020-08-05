@@ -140,6 +140,54 @@ value = common!%#clientIp:172.18.10.218,producerIp:172.18.10.218,bizEnv:lizhi!%#
 
 git fetch和pull详解 <https://www.cnblogs.com/runnerjack/p/9342362.html>
 
+2020.8.5
+
+零钱兑换1，2 
+
+<https://leetcode-cn.com/problems/coin-change-2/solution/ling-qian-dui-huan-iihe-pa-lou-ti-wen-ti-dao-di-yo/>
+
+push开关需求
+
+根据设备id做判断，一天只展示一次。
+
+定义一个类记录设备的状态，放在redis里。
+
+包含字段 type当前状态，isTodayOpen今日是否打开过，上次??????
+
+Type记录用户在哪个时间点状态，
+
+key:设备id  value:type  
+
+客户端可能会有两次请求的，第一次是用户打开相关界面时，请求判断是否弹窗提示。如果有提示，第二次是用户关闭界面时，请求改变type状态。
+
+客户端每次请求的时候，携带通知开关的状态，如果开关是on=0，删除redis，return 提示=1。如果开关是off=1，这时对设备id对应的type类型进行判断，是否  return 提示=0或1
+
+//0-开启    
+
+1-关闭，还未提示，需要第一次提示
+
+2-关闭，提示了一次，需要第二次提示
+
+3-关闭，提示了两次，需要延后五天，多一个字段 记录时间
+
+4-关闭，延后的五天到了，需要第三次提示
+
+5-关闭，提示了三次，需要第四次提示，需要延后30天，时间字段记录30天延后
+
+**天、五天、30天均可配置**
+
+如果
+
+type =0  
+
+=1
+
+
+
+判断是否打开开关
+
+
+
 ## 面经收集
 
 ### 智力题
@@ -1528,6 +1576,22 @@ class Solution {
 }
 ```
 
+#### [470. 用 Rand7() 实现 Rand10()](https://leetcode-cn.com/problems/implement-rand10-using-rand7/)
+
+拒绝采样，关键是知晓如下规律
+
+已知 rand_N() 可以等概率的生成[1, N]范围的随机数
+那么：
+(rand_X() - 1) × Y + rand_Y() ==> 可以等概率的生成[1, X * Y]范围的随机数
+即实现了 rand_XY()
+
+作者：kkbill
+链接：https://leetcode-cn.com/problems/implement-rand10-using-rand7/solution/cong-zui-ji-chu-de-jiang-qi-ru-he-zuo-dao-jun-yun-/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+
+
 #### [516. 最长回文子序列](https://leetcode-cn.com/problems/longest-palindromic-subsequence/)
 
 与第5题对应。dp公式好理解，遍历的顺序难理解，理解dp是一个很难的过程。这里的dp从底下开始网上遍历。
@@ -2269,6 +2333,10 @@ tail -100 /data/logs/php/php_error_5.3.log  | grep  "Memcache::get()";
 #### 查看端口是否被占用
 
 netstat -anp | grep 端口号
+
+#### curl
+
+执行http请求 如 curl  localhost:8080/cover_file/5126102850063143942
 
 ## 操作系统
 
