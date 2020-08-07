@@ -188,24 +188,44 @@ type =0
 
 ### 2020.8.6
 
-今日任务：技术方案+开发基本功能     K个有序链表合并（递归和遍历） K个节点反转链表
+K个有序链表合并（递归和遍历） K个节点反转链表
+
+今日任务：技术方案+开发基本功能     
 
 主播任务系统条件  代码合并主分支 上线
 
-
-
 任务：后台-push开关接口dc
 
-
-
 ~~服务端打点：1.下发push   2.显示小红点  已登录报uid未登录设备id~~
-
-
 
 记得注意的点：
 
 1. redis申请namespace 
 2. redis过期时间配置 apollo
+3. 文案配置 apollo
+4. ~~as端的response和request在哪里配~~
+
+### 8.7
+
+发布接口   mvn clean deploy -Dmaven.test.skip=true -Dlz.env=online
+
+代码规范  switch中的default必须写
+
+~~最近公共父节点~~
+
+BIO/NIO/AIO
+
+Nagle算法  Netty
+
+服务降级  限流  计数器算法  令牌桶算法
+
+
+
+-Dconf.env=test -Dconf.key=lz-vod-whitelist -Dapp.name=lz-vod-whitelist
+
+-Dconf.env=test -Dconf.key=app_vod_sundry -Dapp.name=app_vod_sundry
+
+看网络部分<https://wenjie.store/archives/%E8%85%BE%E8%AE%AF2020%E5%B9%B46%E6%9C%88%E5%87%89%E7%BB%8F?token=496ec87ac07d41e281a2ee73dbf77dce>
 
 ## 面经收集
 
@@ -2228,6 +2248,16 @@ myisam只有表级锁，而innodb支持表、行级锁
 InnoDB是聚集索引，使用B+树作为索引结构，数据文件和（主键）索引绑在一起，必须要有主键，通过主键索引效率很高。辅助索引查找一般要进行回表查询，主键过大会导致其他索引页很大。MyISAM是非聚集索引，也是B+树结构，但是索引和数据文件是分离的，索引保存的是数据文件的指针。
 
 参考：<https://blog.csdn.net/qq_35642036/article/details/82820178>
+
+### InnoDB
+
+InnoDB一个B+树可以放多少行数据？大概2千万行。最小存储单元是页，每个页默认是16K大小，可以通过 innodb_page_size进行设置。
+
+参考： <https://www.jianshu.com/p/3578beed5a68>
+
+### 解决幻读
+
+<https://zhuanlan.zhihu.com/p/83584160>
 
 需要了解的知识点
 
