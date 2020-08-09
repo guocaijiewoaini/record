@@ -1,5 +1,7 @@
  -Dvtag=v_vod_material_ztc
 
+dp[i+1] = dp[i]+min(a[i]+a[i+1],b[i])
+
 ## 软件下载地址
 
 ### mysql:
@@ -823,6 +825,66 @@ class Solution {
 
 
 
+#### [39. 组合总和](https://leetcode-cn.com/problems/combination-sum/)
+
+相比40题，不用检查上一个是否重复，只要做一个<0的剪枝即可。由于可以重复，下次计算的index=i。
+
+```java
+class Solution {
+    public List<List<Integer>> combinationSum(int[] cand, int target) {
+
+        Arrays.sort(cand);
+        return dfs(cand,target,0,new ArrayList<>(),new ArrayList<>());
+    }
+
+    List<List<Integer>> dfs(int[] cand , int target,int index, List<Integer> list,List<List<Integer>> rslist){
+        if(target==0){
+            rslist.add(new ArrayList<>(list));
+            return rslist;
+        }
+        for(int i=index;i<cand.length;i++){
+            if(target-cand[i]<0) break;
+            list.add(cand[i]);
+            dfs(cand,target-cand[i],i,list,rslist);
+            list.remove(list.size()-1);
+        }
+        return rslist;
+    }
+}
+```
+
+
+
+#### [40. 组合总和 II](https://leetcode-cn.com/problems/combination-sum-ii/)
+
+46，47排列问题，两种问题的区别是排列需要used记录，每次for从0开始；而组合不要，每次从上一个index+1开始。
+
+```java
+class Solution {
+    public List<List<Integer>> combinationSum2(int[] cand, int target) {
+        Arrays.sort(cand);
+        return dfs(cand,target,0,new ArrayList<>(),new ArrayList<>());
+    }
+
+    List<List<Integer>> dfs(int[] cand,int target ,int index,List<Integer> list,List<List<Integer>> rsList){
+        if(target==0){
+            rsList.add(new ArrayList<>(list));
+            return rsList;
+        }
+        for(int i=index;i<cand.length;i++){
+            if(target-cand[i]<0) break;
+            if(i>index&&cand[i]==cand[i-1]) continue;
+            list.add(cand[i]);
+            dfs(cand,target-cand[i],i+1,list,rsList);
+            list.remove(list.size()-1);
+        }
+        return rsList;
+    }
+}
+```
+
+
+
 #### 39 组合总和
 
 回溯+剪枝，为了剪枝，每次for循环不从0开始。
@@ -1614,6 +1676,51 @@ class Solution {
     }
 }
 ```
+
+#### [410. 分割数组的最大值](https://leetcode-cn.com/problems/split-array-largest-sum/)
+
+理解起来困难，其实代码不复杂。
+
+```java
+class Solution {
+    public int splitArray(int[] nums, int m) {
+        int max =0;
+        int sum =0;
+        for(int num:nums){
+            max =Math.max(max,num);
+            sum+=num;
+        }
+        //子数组各自和的最大值取值范围在[max,sum]之间
+        //二分法找 满足分区个数为m时的maxSubArrayVal
+        int left = max;
+        int right =sum;
+        while(left<right){
+            int mid =left + (right-left)/2;
+            int splits = getPartiton(nums,mid);
+            if(splits>m){ //分区太多
+                left=mid+1;
+            }else{
+                right=mid;
+            }
+        }
+        return left;
+    }
+    public int getPartiton(int[] nums,int mid){
+        int splits =1;
+        int curSum=0;
+        for(int i=0;i<nums.length;i++){
+            if(curSum+nums[i]>mid){
+                curSum=0;
+                splits++;
+            }
+            curSum+=nums[i];
+        }
+        return splits;
+    }
+}
+```
+
+
 
 #### [470. 用 Rand7() 实现 Rand10()](https://leetcode-cn.com/problems/implement-rand10-using-rand7/)
 
