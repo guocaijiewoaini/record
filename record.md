@@ -1119,7 +1119,36 @@ class Solution {
 }
 ```
 
-使用头插法。
+递归实现，理解起来比较困难，注意理解时不要跳进递归，而是利用明确的定义来实现算法逻辑。
+
+参考详解：<https://leetcode-cn.com/problems/reverse-linked-list-ii/solution/bu-bu-chai-jie-ru-he-di-gui-di-fan-zhuan-lian-biao/>
+
+```java
+class Solution {
+    //递归的实现
+    public ListNode reverseBetween(ListNode head, int m, int n) {
+        if(m==1){
+            return reverseN(head,n);
+ 
+        }
+        head.next =reverseBetween(head.next,m-1,n-1);
+        return head;
+    }
+    ListNode s;
+    public ListNode reverseN(ListNode head,int n){
+        if(n==1){
+            s=head.next;//记录head下一个节点
+            return head;
+        }
+        ListNode last=reverseN(head.next,n-1);
+        head.next.next =head;
+        head.next =s;
+        return last;
+    }
+}
+```
+
+
 
 
 
@@ -1332,6 +1361,52 @@ class Node{
  * obj.put(key,value);
  */
 ```
+
+
+
+#### [128. 最长连续序列](https://leetcode-cn.com/problems/longest-consecutive-sequence/)
+
+每次更新连续数组的边界值为当前连续数组的长度，。
+
+map.put(nums[i],0) 只是表明该数已经被访问了，这里的value可以是任何值
+
+```java
+class Solution {
+    public int longestConsecutive(int[] nums) {
+        if(nums.length==0) return 0;
+        Map<Integer,Integer> map =new HashMap<>();
+        int max =1;
+        for(int i=0;i<nums.length;i++){
+            if(!map.containsKey(nums[i])){
+                int left =map.getOrDefault(nums[i]-1,0);
+                int right =map.getOrDefault(nums[i]+1,0);
+                int cur =left+right+1;
+                if(cur>max){
+                    max= cur;
+                }
+                map.put(nums[i],0);
+                map.put(nums[i]-left,cur);
+                map.put(nums[i]+right,cur);
+            }
+        }
+        return max;
+    }
+}
+```
+
+
+
+#### [129. 求根到叶子节点数字之和](https://leetcode-cn.com/problems/sum-root-to-leaf-numbers/)
+
+递归，空返回0；左树空&&右树空返回n；有一个不为空继续往下加和。
+
+```java
+
+```
+
+
+
+
 
 #### [215. 数组中的第K个最大元素](https://leetcode-cn.com/problems/kth-largest-element-in-an-array/)
 
