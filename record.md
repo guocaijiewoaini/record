@@ -1150,6 +1150,43 @@ class Solution {
 
 
 
+#### [103. 二叉树的锯齿形层次遍历](https://leetcode-cn.com/problems/binary-tree-zigzag-level-order-traversal/)
+
+入队的顺序不用变，遍历队列中元素的时候，一层头插list.addFirst()，下一层尾插list.addLast()
+
+```java
+class Solution {
+    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+        LinkedList<Integer> list =new LinkedList<>();
+        List<List<Integer>> rslist =new ArrayList<>();
+        if(root==null) return rslist;
+        Queue<TreeNode> queue =new LinkedList<>();
+        queue.add(root);
+        int cnt =1;
+        boolean flag =true;
+        while(!queue.isEmpty()){
+            TreeNode t = queue.poll();
+            if(flag){
+                list.addLast(t.val);
+            }else{
+                list.addFirst(t.val);
+            }
+            cnt--;
+            if(t.left!=null) queue.add(t.left);
+            if(t.right!=null) queue.add(t.right);
+            
+            if(cnt==0){
+                cnt =queue.size();
+                flag=!flag;
+                rslist.add(new LinkedList<>(list));
+                list =new LinkedList<>();
+            }
+        }
+        return rslist;
+    }
+}
+```
+
 
 
 
@@ -1635,6 +1672,7 @@ class Solution {
         ListNode fast =head;
         ListNode pre = null;
         ListNode cur = head;
+        //遍历的同时,进行反转
         while(fast!=null&&fast.next!=null){
             cur =slow;
             slow =slow.next;
@@ -1642,6 +1680,10 @@ class Solution {
             cur.next=pre;
             pre =cur;
         }
+        //cur是前半部分反转后的头节点   
+        //此时的slow是后半部分的头节点
+        //如果是奇数个节点的话 现在fast!=null,slow还需要往下走一步,因为中间那个节点不用比较需要跳过。
+        //偶数节点则不用
         if(fast!=null) slow = slow.next;
         while(slow!=null){
             if(slow.val!=cur.val) return false;
@@ -1791,6 +1833,31 @@ class Solution {
             curSum+=nums[i];
         }
         return splits;
+    }
+}
+```
+
+#### [424. 替换后的最长重复字符](https://leetcode-cn.com/problems/longest-repeating-character-replacement/)
+
+```java
+class Solution {
+    public int characterReplacement(String s, int k) {
+        int[] map =new int[26];
+        char[] chs =s.toCharArray();
+        int left=0,right=0;
+        int result=0;
+        int maxCharCount = 0;
+        while(right<s.length()){
+            map[chs[right]-'A']++;
+            maxCharCount=Math.max(maxCharCount,map[chs[right]-'A']);
+            if(right-left+1-maxCharCount>k){
+                map[chs[left]-'A']--;
+                left++;
+            }
+            result=Math.max(result,right-left+1);
+            right++;
+        }
+        return result;
     }
 }
 ```
