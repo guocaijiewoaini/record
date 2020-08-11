@@ -229,6 +229,22 @@ Nagle算法  Netty
 
 看网络部分<https://wenjie.store/archives/%E8%85%BE%E8%AE%AF2020%E5%B9%B46%E6%9C%88%E5%87%89%E7%BB%8F?token=496ec87ac07d41e281a2ee73dbf77dce>
 
+### 8.11
+
+redis问题 :写redis发现key  ttl查询为-1
+
+解决：查看代码发现
+
+```java
+timeUnit =  24 * 3600 * 1000;
+//.....省略代码
+long expireTime = (long) 36 * timeUnit ;
+```
+
+时间类型 int*int超过了int上限，溢出变成负数了，使用long进行接收 ，同时对整型的运算进行强制转换。
+
+
+
 ## 面经收集
 
 ### 智力题
