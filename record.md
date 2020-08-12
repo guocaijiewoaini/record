@@ -1,6 +1,8 @@
- -Dvtag=v_vod_material_ztc
+ -Dvtag=v_lizhi_pushGuide_20200812
 
-dp[i+1] = dp[i]+min(a[i]+a[i+1],b[i])
+力扣待做    1312
+
+
 
 ## 软件下载地址
 
@@ -2797,6 +2799,10 @@ OSI中的层            功能                                                  
 数据链路层：网桥（现已很少使用）、以太网交换机（二层交换机）、网卡（其实网卡是一半工作在物理层、一半工作在数据链路层）
 
 物理层：中继器、集线器、还有我们通常说的双绞线也工作在物理层
+
+### 数据传输流程
+
+<https://blog.csdn.net/xiayun1995/article/details/82380819>
 
 ### DNS
 
