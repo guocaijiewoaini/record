@@ -1065,6 +1065,28 @@ class Solution {
 }
 ```
 
+递归方法
+
+参考<https://leetcode-cn.com/problems/powx-n/solution/powx-n-by-leetcode-solution/>
+
+```java
+class Solution {
+    public double myPow(double x, int n) {
+        
+        long N =n;
+        return n>0?pow(x,N):1.0/pow(x,-N);
+    }
+
+    public double pow(double x,long n){
+        if(n==0){
+            return 1.0;
+        }
+        double y =pow(x,n/2);
+        return (n&1)==0?y*y:y*y*x;
+    }
+}
+```
+
 
 
 #### 54 螺旋矩阵
