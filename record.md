@@ -1018,6 +1018,37 @@ class Solution {
 }
 ```
 
+
+
+#### [50. Pow(x, n)](https://leetcode-cn.com/problems/powx-n/)
+
+迭代的方法比较好理解，注意细节即可。面试可能要求递归写法，也要掌握。
+
+```java
+class Solution {
+    public double myPow(double x, int n) {
+        boolean flag =false;
+        long p = n;//这里有个坑，n可能为-2147483648 直接取反再赋值给n就溢出了。
+        if(p<0){
+            flag=true;
+            p=-p;
+        }
+        double base =x;
+        double res =1.0;
+        while(p>0){
+            if((p&1)!=0){
+                res*=base;
+            }
+            p>>=1;
+            base*=base;
+        }
+        return flag?(1.0/res):res;
+    }
+}
+```
+
+
+
 #### 54 螺旋矩阵
 
 四个指针控制范围，向右，向下，向左，向上遍历，注意边界条件。
