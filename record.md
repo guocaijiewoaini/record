@@ -1,6 +1,8 @@
- -Dvtag=v_vod_material_ztc
+ -Dvtag=v_lizhi_pushGuide_20200812
 
-dp[i+1] = dp[i]+min(a[i]+a[i+1],b[i])
+力扣待做    1312
+
+
 
 ## 软件下载地址
 
@@ -228,6 +230,22 @@ Nagle算法  Netty
 -Dconf.env=test -Dconf.key=app_vod_sundry -Dapp.name=app_vod_sundry
 
 看网络部分<https://wenjie.store/archives/%E8%85%BE%E8%AE%AF2020%E5%B9%B46%E6%9C%88%E5%87%89%E7%BB%8F?token=496ec87ac07d41e281a2ee73dbf77dce>
+
+### 8.11
+
+redis问题 :写redis发现key  ttl查询为-1
+
+解决：查看代码发现
+
+```java
+timeUnit =  24 * 3600 * 1000;
+//.....省略代码
+long expireTime = (long) 36 * timeUnit ;
+```
+
+时间类型 int*int超过了int上限，溢出变成负数了，使用long进行接收 ，同时对整型的运算进行强制转换。
+
+
 
 ## 面经收集
 
@@ -1259,6 +1277,36 @@ class Solution {
 }
 ```
 
+#### [102. 二叉树的层序遍历](https://leetcode-cn.com/problems/binary-tree-level-order-traversal/)
+
+递归和迭代，迭代借助队列比较简单，这里只贴出递归的写法。
+
+```java
+class Solution {
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> list =new ArrayList<>();
+        if(root==null) return list;
+        dfs(root,1,list);
+        return list;
+    }
+
+    void dfs(TreeNode root ,int index ,List<List<Integer>> list){
+        if(list.size()<index){
+            list.add(new ArrayList<>());
+        }
+        list.get(index-1).add(root.val);
+        if(root.left!=null){
+            dfs(root.left,index+1,list);
+        }
+        if(root.right!=null){
+            dfs(root.right,index+1,list);
+        }
+    }
+}
+```
+
+
+
 #### [111. 二叉树的最小深度](https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/)
 
 这个题跟最大深度差不多，但是有个小坑。
@@ -2195,6 +2243,14 @@ class Solution {
 
 ## Java基础
 
+### 深拷贝和浅拷贝
+
+定义如下：
+
+浅拷贝（shallowCopy）只是增加了一个指针指向已存在的内存地址，
+
+深拷贝（deepCopy）是增加了一个指针并且申请了一个新的内存，使这个增加的指针指向这个新的内存，
+
 ### Java8
 
 - ThreadLocal.withInitial
@@ -2470,6 +2526,12 @@ jstack可以定位哪些问题？ <https://www.cnblogs.com/chenpi/p/5377445.html
 2. 传输快，传输基于零拷贝实现，减少不必要的内存拷贝，传输效率高
 3. 封装好，封装了NIO的很多操作细节，提供了易用的接口调用
 
+#### Netty的心跳机制
+
+IdleStateHandler
+
+<https://blog.csdn.net/u013967175/article/details/78591810>
+
 #### Netty的零拷贝
 
 **传统意义的零拷贝**
@@ -2536,6 +2598,13 @@ InnoDB是聚集索引，使用B+树作为索引结构，数据文件和（主键
 ### InnoDB
 
 InnoDB一个B+树可以放多少行数据？大概2千万行。最小存储单元是页，每个页默认是16K大小，可以通过 innodb_page_size进行设置。
+
+计算过程
+
+主键 bigint 8字节+指针 6字节 =14字节 。
+根页 16k/14=1170
+一行数据1k,每页存16k/1k=16
+三层b+树应该是 1170*1170*16=21902400
 
 参考： <https://www.jianshu.com/p/3578beed5a68>
 
@@ -2679,6 +2748,10 @@ netstat -anp | grep 端口号
 
 执行http请求 如 curl  localhost:8080/cover_file/5126102850063143942
 
+#### 统计当前文件夹下面.jpg文件的数量
+
+ls -l | grep '.*\.jpg' | wc -l
+
 ## 操作系统
 
 这部分建议微信公众号搜 小林coding 。有文章讲解特别详细。
@@ -2812,6 +2885,10 @@ OSI中的层            功能                                                  
 数据链路层：网桥（现已很少使用）、以太网交换机（二层交换机）、网卡（其实网卡是一半工作在物理层、一半工作在数据链路层）
 
 物理层：中继器、集线器、还有我们通常说的双绞线也工作在物理层
+
+### 数据传输流程
+
+<https://blog.csdn.net/xiayun1995/article/details/82380819>
 
 ### DNS
 
