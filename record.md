@@ -519,6 +519,16 @@ T[n]=aT[n/b]+f(n)
 
 #### 快排
 
+快排的时间复杂度平均为O(nlogn)
+
+最坏的情况是每次取到数组中最小/最大的元素，这种情况等同冒泡排序，时间复杂度 n*(n-1) =n^2-n 即O(n)。
+
+最优的情况是每次取到的元素都刚好平分整个数组。此时可根据master公式
+
+**T[n] = aT[n/b] + f(n)**   a=2，b=2 -> **T[n] = 2T[n/2] + f(n)** 
+
+根据公式迭代推导可得 快排的最优时间复杂度 **T[n] = 2^(logn) T[1] + nlogn  =  n T[1] + nlogn  =  n + nlogn** 
+
 ```java
 public void quicksort(int[] nums ,int start, int end){
 
@@ -1421,6 +1431,69 @@ class Solution {
         }
         return 0;
     }
+```
+
+#### [143. 重排链表](https://leetcode-cn.com/problems/reorder-list/)
+
+先找到中间节点，然后反转后半部分链表，然后合并反转后的后半部分和前半部分
+
+```
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public void reorderList(ListNode head) {
+        if(head==null) return;
+        ListNode before =head;
+        ListNode midNode =getMidNode(head);//拿到中间节点
+
+        //反转后半段的链表
+        ListNode behind =midNode.next;
+        midNode.next=null;
+        behind = reverse(behind);
+        // midNode.next=null;
+        merge(before,behind);
+    }
+    void merge(ListNode before,ListNode behind){
+        while(behind!=null){
+            ListNode nex1 =before.next;
+            before.next =behind;
+            ListNode nex2 =behind.next;
+            behind.next=nex1;
+            behind=nex2;
+            before=nex1;
+        }
+    }
+    ListNode reverse(ListNode node){
+        ListNode tmp =node;
+        ListNode p1 =node;
+        ListNode p2 =null;
+        while(tmp!=null){
+            p1=tmp.next;
+            tmp.next=p2;
+            p2=tmp;
+            tmp=p1;
+        }
+        return p2;
+    }
+    ListNode getMidNode(ListNode node){
+        if(node ==null) return null;
+        ListNode slow =node;
+        ListNode fast =node;
+        while(fast!=null&&fast.next!=null){
+            slow=slow.next;
+            fast=fast.next.next;
+        }
+        return slow;
+    }
+}
 ```
 
 
