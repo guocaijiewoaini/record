@@ -1,6 +1,18 @@
- -Dvtag=v_lizhi_pushGuide_20200812
+-Dvtag=v_dianbo_modifytopic
 
-力扣待做    1312
+-Dvtag=v_lizhi_pushGuide_20200812
+
+力扣待做    
+
+1312  字符串转回文串的最少插入次数   
+
+72 字符串1转字符串2 的最少操作次数
+
+根据前序和中序复原二叉树
+
+二叉树转双向链表
+
+
 
 
 
@@ -245,6 +257,53 @@ long expireTime = (long) 36 * timeUnit ;
 
 时间类型 int*int超过了int上限，溢出变成负数了，使用long进行接收 ，同时对整型的运算进行强制转换。
 
+### 8.17
+
+1. ~~position  从1开始，有没有限制范围？~~  对
+2. ~~channelId是不是应该为integer类型，数据库中是bitint对应long~~  没关系
+3. ~~模块内容中的   声音==节目吗？~~  对
+4. ~~选中【分类页】时，在右侧出现选择分类下拉框，可选择实际要跳转的所有一级分类（由服务端下发）  返回的内容是分类页的id吗？~~ 对
+5. ~~url存储的时候要进行处理吗？~~
+
+
+接口测试用例
+
+```java
+{
+  "id":"5128885462689122431",
+  "channelId": 20100,
+  "name": "asww",
+  "position": 1,
+  "hasMore": 1,
+  "moreActionType": 86,
+  "moreActionContent": "20100",
+  "contentType": 0,
+  "num": 3,
+  "contentList": [
+    {
+        "id":"5128917805940342911",
+      "position": 2,
+      "targetId": "2822707111228610566",
+      "coverUrl": "http://521110.com"
+    },
+    {
+        "id":"5128917805940343423",
+      "position": 3,
+      "targetId": "2822707111228610566",
+      "coverUrl": "http://5223230.com"
+    },
+    {
+        "id":"5128917805940343935",
+      "position": 4,
+      "targetId": "2822707111228610566",
+      "coverUrl": "http://52444440.com"
+    }
+  ],
+  "status": 0,
+  "showStatus": 0
+}
+```
+
 
 
 ## 面经收集
@@ -310,6 +369,56 @@ dns具体讲讲
 可以看到，不在 6 的倍数两侧，即 6x 两侧的数为 6x+2，6x+3，6x+4，由于 2 (3x+1)，3 (2x+1)，2 (3x+2)，所以它们一定不是素数，再除去 6x 本身，显然，素数要出现只可能出现在 6x 的相邻两侧。
 
 所以循环的步长可以设为 6，然后每次只判断 6 两侧的数即可。
+
+```java
+ /**
+     * 判断n是否素数
+     */
+    //解法1 暴力
+    public boolean isPrimeNumber1(int n) {
+        if (n < 2) return false;
+
+        if (n == 2) return true;
+        for (int i = 2; i < n; i++) {
+            if (n % i == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //解法2 sqrt(n)
+    public boolean isPrimeNumber2(int n) {
+        if (n < 2) return false;
+        if (n == 2) return true;
+        int sqrt = (int) Math.sqrt(n);
+        for (int i = 2; i <= sqrt; i++) {
+            if (n % i == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //解法3 找到规律==> 大于等于 5 的素数一定和 6 的倍数相邻。但是和6的倍数相邻的数不一定是素数。因为合数总是可以写成素数的乘积，那么我们直接用n去除以质数就可以达到很好地优化目的。
+    public boolean isPrimeNumber3(int n) {
+        if (n < 5) {
+            return n == 2 || n == 3;
+        }
+        if (n % 6 != 1 && n % 6 != 5) {
+            return false;
+        }
+        int sqrt = (int) Math.sqrt(n);
+        for (int i = 5;i<=sqrt;i++){
+            if(n%i==0||n%(i+2)==0){
+                return false;
+            }
+        }
+        return true;
+    }
+```
+
+
 
 #### IP地址和字符串互转
 
@@ -655,6 +764,37 @@ public void swap(int[] nums,int i, int j){
 ### leetcode
 
 #### [5. 最长回文子串](https://leetcode-cn.com/problems/longest-palindromic-substring/)
+
+i从尾开始好理解一些
+
+```java
+class Solution {
+    public String longestPalindrome(String s) {
+        if(s==null||s.length()==0) return s;
+        char[] chs =s.toCharArray();
+        int n=s.length();
+        boolean[][] dp= new boolean[n][n];
+        int start =0;
+        int end =0;
+        for(int i=n-1;i>=0;i--){
+            for(int j=i;j<n;j++){
+                if(chs[i]==chs[j]&&(j-i<3||dp[i+1][j-1])){
+                    dp[i][j]=true;
+                    if(j-i>end-start){
+                        start=i;
+                        end=j;
+                    }
+                }else{
+                    dp[i][j]=false;
+                }
+            }
+        }
+        return s.substring(start,end+1);
+    }
+}
+```
+
+
 
 ```java
 class Solution {
@@ -1161,6 +1301,48 @@ class Solution {
 }
 ```
 
+#### [59. 螺旋矩阵 II](https://leetcode-cn.com/problems/spiral-matrix-ii/)
+
+和54题做法类似。
+
+```java
+class Solution {
+    public int[][] generateMatrix(int n) {
+        int[][] res =new int[n][n];
+        if(n==0) return res;
+        int left =0;int right = n-1;int bottom =0;int top =n-1;
+        int cur =1;
+        while(cur<=n*n){
+            //向右
+            for(int i=left;i<=right;i++){
+                res[bottom][i]=cur++;
+            }
+            //向下
+            for(int i=bottom+1;i<=top;i++){
+                res[i][right]=cur++;
+            }
+            if(bottom<top){
+                for(int i=right-1;i>=left;i--){
+                    res[top][i]=cur++;
+                }
+            }
+            if(right>left){
+                for(int i=top-1;i>bottom;i--){
+                    res[i][left]=cur++;
+                }
+            }
+            left++;
+            bottom++;
+            right--;
+            top--;
+        }
+        return res;
+    }
+}
+```
+
+
+
 #### 64 最小路径和
 
 简单dp，代码如下。
@@ -1432,6 +1614,53 @@ class Solution {
         return 0;
     }
 ```
+
+#### [118. 杨辉三角](https://leetcode-cn.com/problems/pascals-triangle/)
+
+杨辉三角的生成，找规律题。
+
+```java
+class Solution {
+    public List<List<Integer>> generate(int numRows) {
+        List<List<Integer>> res =new ArrayList<>();
+        List<Integer> sub =new ArrayList<>();
+        for(int i=0;i<numRows;i++){
+            for(int j=0;j<=i;j++){
+                if(j==0||j==i){
+                    sub.add(1);
+                }else{
+                    sub.add(res.get(i-1).get(j-1)+res.get(i-1).get(j));
+                }
+            }
+            res.add(new ArrayList<>(sub));
+            sub=new ArrayList<>();
+        }
+        return res;
+    }
+}
+```
+
+#### [119. 杨辉三角 II](https://leetcode-cn.com/problems/pascals-triangle-ii/)
+
+```java
+class Solution {
+    public List<Integer> getRow(int rowIndex) {
+        List<Integer> list =new ArrayList<>();
+        for(int i=0;i<=rowIndex;i++){
+            list.add(1);
+            //由于循环中计算list中j的值用到了list的j-1的值，
+            //所以应该从后往前遍历
+            //第一个元素和最后一个元素固定为1不动，修改其他位置元素
+            for(int j=list.size()-2;j>0;j--){
+                list.set(j,list.get(j)+list.get(j-1));
+            }
+        }
+        return list;
+    }
+}
+```
+
+
 
 #### [143. 重排链表](https://leetcode-cn.com/problems/reorder-list/)
 
@@ -2091,8 +2320,8 @@ class Solution {
         if(n==0) return 0;
         char[] a =s.toCharArray();
         int[][] dp =new int[n][n];
-        for(int i=0;i<n;i++) dp[i][i]=1;
         for(int i=n-1;i>=0;i--){
+            dp[i][i]=1;
             for(int j=i+1;j<n;j++){
                 if(a[i]==a[j]){
                     dp[i][j]=dp[i+1][j-1]+2;
@@ -2167,6 +2396,40 @@ class Solution {
 }
 ```
 
+#### [885. 螺旋矩阵 III](https://leetcode-cn.com/problems/spiral-matrix-iii/)
+
+```java
+class Solution {
+    public int[][] spiralMatrixIII(int R, int C, int r0, int c0) {
+        int[][] steps =new int[][]{
+            {0,1},{1,0},{0,-1},{-1,0}
+            };
+        int n =0;//方向 0-向右 1-向下 2-向左 3-向上
+        int m =0;//当次应走的步数
+        int[][] res =new int[R*C][2];
+        res[0][0]=r0;
+        res[0][1]=c0;
+        int index = 1;
+        while(index<R*C){
+            for(int i=0;i<=m;i++){
+                r0+=steps[n][0];
+                c0+=steps[n][1];
+                if(r0>=0&&r0<R&&c0>=0&&c0<C){
+                    res[index][0]=r0;
+                    res[index][1]=c0;
+                    index++;
+                }
+                if(index==R*C) return res;
+            }
+            //这两行是算法的关键之处
+            m+=(n%2);//每两次的step相等，即n增加2对应m增加1
+            n=(n+1)%4;// n=0 ->n=1 ->n=2->n=3 ->n=0.....方向的循环变化
+        }
+        return res;
+    }
+}
+```
+
 
 
 #### [919. 完全二叉树插入器](https://leetcode-cn.com/problems/complete-binary-tree-inserter/)
@@ -2225,6 +2488,22 @@ class CBTInserter {
  * TreeNode param_2 = obj.get_root();
  */
 ```
+
+#### [1226. 哲学家进餐](https://leetcode-cn.com/problems/the-dining-philosophers/)
+
+这个题考察的是如何避免死锁。
+
+死锁的四个必要条件：
+
+1.互斥。同一时间资源只能被一个进程使用。
+
+2.请求和保持。进程至少保持了一个资源，但又提出新的资源请求，而该资源被别的线程占用，此时请求的线程被阻塞，但对自己获得的资源保持不变。
+
+3.循环等待。多个进程之间形成了首尾相接循环等待的资源关系。
+
+4.不可剥夺。资源只能被获得该资源的进程主动释放，不可被强行剥夺。
+
+
 
 ### 剑指Offer
 
