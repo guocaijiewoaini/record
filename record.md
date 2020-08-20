@@ -304,6 +304,10 @@ long expireTime = (long) 36 * timeUnit ;
 }
 ```
 
+### 8.20
+
+两个子节点的最近公共父节点
+
 
 
 ## 面经收集
@@ -355,6 +359,10 @@ dns具体讲讲
 <https://www.nowcoder.com/discuss/426600?toCommentId=6170066>
 
 ## 算法+数据结构
+
+### 二分法模板
+
+<https://leetcode-cn.com/problems/search-insert-position/solution/te-bie-hao-yong-de-er-fen-cha-fa-fa-mo-ban-python-/>
 
 ### 杂题
 
@@ -995,16 +1003,21 @@ class Solution {
         if(n==1) return nums[0]==target?0:-1;
         int l=0,r=n-1;
         
+        //注意r>=l
         while(l<=r){
             int mid = (l+r)/2;
             if(nums[mid]==target) return mid;
-            if(nums[mid]>=nums[0]){//左边有序 右边无序  然后判断target在不在里面
+            //先找到有序的区间，if条件成立则左边有序
+            if(nums[mid]>=nums[0]){
+                //target在左边区间的话
                 if(nums[0]<=target&&target<nums[mid]){
                     r=mid-1;
                 }else{
                     l=mid+1;
                 }
+                //右边有序
             }else{
+                //在区间内
                 if(nums[mid]<target&&target<=nums[n-1]){
                     l=mid+1;
                 }else{
@@ -1366,6 +1379,30 @@ class Solution {
     }
 }
 ```
+
+#### [69. x 的平方根](https://leetcode-cn.com/problems/sqrtx/)
+
+1.二分法  2.牛顿迭代法
+
+```java
+class Solution {
+    // f(x)=x*x-a
+    // f(x) =f(x0)+(x-x0)f'(x)
+    //f(x)=0
+    //x=-f(x0)/f'(x)+x0
+    //x=x0代入
+    //x=(-1/2)*(x0-a/x0)+x0 =(1/2)*(x0+a/x0)
+    public int mySqrt(int x) {
+        long res =x ;
+        while(res*res>x){
+            res=(res+x/res)>>1;
+        }
+        return (int)res;
+    }
+}
+```
+
+
 
 #### [92. 反转链表 II](https://leetcode-cn.com/problems/reverse-linked-list-ii/)
 
@@ -2503,6 +2540,32 @@ class CBTInserter {
 
 4.不可剥夺。资源只能被获得该资源的进程主动释放，不可被强行剥夺。
 
+#### [1312. 让字符串成为回文串的最少插入次数](https://leetcode-cn.com/problems/minimum-insertion-steps-to-make-a-string-palindrome/)
+
+新瓶装旧酒，本质上就是最长回文子序列516题。
+
+```java
+class Solution {
+    //求最长的回文子序列len，用n-len 即可得到最少插入次数
+    public int minInsertions(String s) {
+        char[] chs =s.toCharArray();
+        int n =s.length();
+        int[][] dp =new int[n][n];
+        for(int i=n-1;i>=0;i--){
+            dp[i][i]=1;
+            for(int j=i+1;j<n;j++){
+                if(chs[i]==chs[j]){
+                    dp[i][j]=dp[i+1][j-1]+2;
+                }else{
+                    dp[i][j]=Math.max(dp[i+1][j],dp[i][j-1]);
+                }
+            }
+        }
+        return n-dp[0][n-1];
+    }
+}
+```
+
 
 
 ### 剑指Offer
@@ -2630,6 +2693,49 @@ class Solution {
     }
 }
 ```
+
+
+
+#### [剑指 Offer 68 - I. 二叉搜索树的最近公共祖先](https://leetcode-cn.com/problems/er-cha-sou-suo-shu-de-zui-jin-gong-gong-zu-xian-lcof/)
+
+```java
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        TreeNode l =p.val>q.val?q:p;
+        TreeNode r =p.val>q.val?p:q;
+        TreeNode t= root;
+        while(t!=null){
+            if(t.val>r.val){
+                t=t.left;
+            }else if(t.val<l.val){
+                t=t.right;
+            }else{
+                return t;
+            }
+        }
+        return null;
+    }
+}
+```
+
+
+
+#### [剑指 Offer 68 - II. 二叉树的最近公共祖先](https://leetcode-cn.com/problems/er-cha-shu-de-zui-jin-gong-gong-zu-xian-lcof/)
+
+```java
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if(root==null||root==q||root==p) return root;
+        TreeNode l =lowestCommonAncestor(root.left,p,q);
+        TreeNode r =lowestCommonAncestor(root.right,p,q);
+        if(l==null) return r;
+        if(r==null) return l;
+        return root;
+    }
+}
+```
+
+
 
 ## 设计模式
 
