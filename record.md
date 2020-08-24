@@ -308,7 +308,11 @@ long expireTime = (long) 36 * timeUnit ;
 
 两个子节点的最近公共父节点
 
+### 8.21
 
+springboot自动装配原理
+
+springboot启动过程
 
 ## 面经收集
 
@@ -1697,6 +1701,48 @@ class Solution {
 }
 ```
 
+#### [123. 买卖股票的最佳时机 III](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iii/)
+
+这道题很多题解都是复杂的动态规划（理解困难），实际上遍历两遍数组就可以，本质上是把prices数组拆分成两个，第一次交易再前半部分，第二次交易在后半部分。
+
+参考：<https://www.bilibili.com/video/BV1ED4y1Q7AP>
+
+```java
+class Solution {
+    public int maxProfit(int[] prices) {
+        //由于只能买卖两次，因此两次遍历prices数组
+        //一次从头到尾Ldp，一次从尾到头Rdp
+        //找到Ldp[i]+Rdp[i]的最大值
+        int n =prices.length;
+        if(prices==null||n<2){return 0;}
+        //从左往右
+        int[] Ldp =new int[n];
+        int min =prices[0];Ldp[0]=0;
+        for(int i=1;i<n;i++){
+            if(min>prices[i]){
+                min=prices[i];
+            }
+            Ldp[i]=Math.max(prices[i]-min,Ldp[i-1]);
+        }
+
+        int[] Rdp =new int[n];
+        int max =prices[n-1];
+        Rdp[n-1]=0;
+        for(int j=n-2;j>=0;j--){
+            if(prices[j]>max){
+                max=prices[j];
+            }
+            Rdp[j]=Math.max(max-prices[j],Rdp[j+1]);
+        }
+        int res = 0;
+        for(int k=0;k<n;k++){
+            res =Math.max(res,Rdp[k]+Ldp[k]);
+        }
+        return res;
+    }
+}
+```
+
 
 
 #### [143. 重排链表](https://leetcode-cn.com/problems/reorder-list/)
@@ -2206,6 +2252,34 @@ class Solution {
 }
 ```
 
+
+
+#### [309. 最佳买卖股票时机含冷冻期](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
+
+三种状态的转换，动态规划。
+
+参考：<https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/solution/yi-tu-miao-dong-jie-fa-by-zi-gei-zi-zu/>
+
+```java
+class Solution {
+    public int maxProfit(int[] prices) {
+        int n =prices.length;
+        if(n<2) return 0;
+        int[][] dp =new int[n][3];
+        //0-持有   1-不持有 冷冻期不可买  2-不持有 可买
+        dp[0][0]=-prices[0];
+        for(int i=1;i<n;i++){
+            dp[i][0] =Math.max(dp[i-1][0],dp[i-1][2]-prices[i]);
+            dp[i][1] =dp[i-1][0]+prices[i];
+            dp[i][2] =Math.max(dp[i-1][1],dp[i-1][2]);
+        }
+        return Math.max(dp[n-1][1],dp[n-1][2]);
+    }
+}
+```
+
+
+
 #### [322. 零钱兑换](https://leetcode-cn.com/problems/coin-change/)
 
 自顶向下---dfs，自底向上--动态规划。dp[0]=0很巧妙，这样当i=coins[j]时，dp[i-coin]+1=1表示使用coin一次。
@@ -2432,6 +2506,64 @@ class Solution {
     }
 }
 ```
+
+#### [679. 24 点游戏](https://leetcode-cn.com/problems/24-game/)
+
+```java
+class Solution {
+    static final int TARGET = 24;
+    static final double EPSILON = 1e-6;
+    static final int ADD = 0, MULTIPLY = 1, SUBTRACT = 2, DIVIDE = 3;
+    public boolean judgePoint24(int[] nums) {
+        List<Double> list =new ArrayList<>();
+        for(int num:nums){
+            list.add((double)num);
+        }
+        return solve(list);
+
+    }
+
+    public boolean solve(List<Double> list){
+        int size =list.size();
+        if(list.size()==0) return false;
+        if(list.size()==1) return Math.abs(list.get(0)-TARGET)<EPSILON;
+        for(int i=0;i<size;i++){
+            for(int j=0;j<size;j++){
+                
+                if(i!=j){
+                    List<Double> list2 =new ArrayList<>();
+                    for(int k=0;k<size;k++){
+                        if(k!=i&&k!=j) list2.add(list.get(k));
+                    }
+                    for(int k=0;k<4;k++){
+                        if(k<2&&i>j) {continue;}
+                        if(k==ADD){//加
+                            list2.add(list.get(i)+list.get(j));
+                        }
+                        else if(k==MULTIPLY){//乘
+                            list2.add(list.get(i)*list.get(j));
+                        }
+                        else if(k==SUBTRACT){//减
+                            list2.add(list.get(i)-list.get(j));
+                        }
+                        else if(k==DIVIDE){//除
+                            if(Math.abs(list.get(j))<EPSILON) continue;
+                            else list2.add(list.get(i)/list.get(j));
+                        }
+                        if(solve(list2)){
+                            return true;
+                        }
+                        list2.remove(list2.size()-1);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+}
+```
+
+
 
 #### [885. 螺旋矩阵 III](https://leetcode-cn.com/problems/spiral-matrix-iii/)
 
@@ -2748,6 +2880,17 @@ class Solution {
 
 
 ## Java基础
+
+### 注解
+
+java的元注解一共有四个：
+
+1. @Document
+2. @Target
+3. @Retention
+4. @Inherited
+
+
 
 ### 深拷贝和浅拷贝
 
@@ -3431,6 +3574,10 @@ ping是基于ICMP协议工作的，参考文章
 
 ## 中间件和框架
 
+### SpringBoot
+
+
+
 ### Spring
 
 #### Bean生命周期
@@ -3580,7 +3727,7 @@ Zab协议分为三部分：
 
     - 1. 各个节点变为Looking状态
 
-         Leader宕机后，各个Follower节点状态变更为Looking，参与Leader选举过程。Observer不参与。
+        Leader宕机后，各个Follower节点状态变更为Looking，参与Leader选举过程。Observer不参与。
 
       2. 各个Server节点发起投票
 
@@ -3595,3 +3742,7 @@ Zab协议分为三部分：
    - 数据同步
 
      崩溃恢复完成选举以后，接下来的工作就是数据同步，在选举过程中，通过投票已经确认 Leader 节点是最大 Zxid 的节点，同步阶段就是利用 Leader 前一阶段获得的最新 Proposal 历史同步集群中所有的副本。
+
+### 项目
+
+断点续传 https://github.com/niumoo/down-bit
