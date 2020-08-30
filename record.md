@@ -1643,6 +1643,58 @@ class Solution {
 
 
 
+#### [199. 二叉树的右视图](https://leetcode-cn.com/problems/binary-tree-right-side-view/)
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    //深搜递归
+    public List<Integer> rightSideView(TreeNode root) {
+        List<Integer> list =new ArrayList<>();
+        dfs(root,list,0);
+        return list;
+    }
+    public void dfs(TreeNode root,List<Integer> list,int depth){
+        if(root==null) return;
+        if(depth==list.size()){
+            list.add(root.val);
+        }
+        depth++;
+        dfs(root.right,list,depth);
+        dfs(root.left,list,depth);
+    }
+
+    //广搜
+    public List<Integer> rightSideView(TreeNode root) {
+        List<Integer> list =new ArrayList<>();
+        if(root==null) return list;
+        Queue<TreeNode> queue =new LinkedList<>();
+        queue.add(root);
+        int cnt=1;
+        while(!queue.isEmpty()){
+            TreeNode t =queue.poll();
+            if(t.left!=null) queue.add(t.left);
+            if(t.right!=null) queue.add(t.right);
+            cnt--;
+            if(cnt ==0){
+                list.add(t.val);
+                cnt= queue.size();
+            }
+        }
+        return list;
+
+    }
+}
+```
+
 
 
 #### [215. 数组中的第K个最大元素](https://leetcode-cn.com/problems/kth-largest-element-in-an-array/)
@@ -2875,13 +2927,20 @@ ls -l | grep '.*\.jpg' | wc -l
 
 ## 操作系统
 
-这部分建议微信公众号搜 小林coding 。有文章讲解特别详细。
+### 死锁的四个必要条件
+
+1. 互斥
+2. 请求和保持
+3. 循环等待
+4. 不可抢占
+
+虚拟内存和物理内存和分页管理这部分建议微信公众号搜 小林coding 。有文章讲解特别详细。
 
 虚拟内存和物理内存的映射关系和工作原理：
 
 <https://blog.csdn.net/don_chiang709/article/details/89087709>
 
-#### 虚拟地址技术、分页、分段
+### 虚拟地址技术、分页、分段
 
 虚拟地址技术解决了各个进程同时运行时对物理内存的访问冲突，为每个进程单独分配一套独立的虚拟地址，映射到不同的物理内存，实现了进程之间的内存隔离。通过MMU 内存管理单元实现的虚拟地址到物理地址的映射。
 
@@ -2905,7 +2964,7 @@ ls -l | grep '.*\.jpg' | wc -l
 
 
 
-#### 进程通信
+### 进程通信
 
 1. 信号
 
@@ -2923,7 +2982,7 @@ ls -l | grep '.*\.jpg' | wc -l
 
 7. Socket。用于不同主机的进程之间的通信。
 
-#### 进程调度算法
+### 进程调度算法
 
 1. 先来先服务   短进程响应时间过长
 2. 短任务优先    长进程会产生饥饿现象
@@ -2954,6 +3013,10 @@ https握手阶段比较费时。
 SSL证书需要收费。
 
 SSL证书需要绑定IP，不能在同一个ip绑定多个域名，ipv4资源支持不了这种消耗。
+
+### SSL过程
+
+参考：<https://blog.csdn.net/weixin_42600398/article/details/104128676>
 
 --------------------------------------------
 
@@ -3046,6 +3109,22 @@ ping是基于ICMP协议工作的，参考文章
 
 ## 中间件和框架
 
+### SpringBoot自动装配
+
+SpringBoot启动类上的注解@SpringBootApplication，这个注解包含了@SpringBootConfiguration和@ComponentScan和@EnableAutoConfiguration三个注解。自动装配的核心在于注解@EnableAutoConfiguration，它包含关键注解@Import({AutoConfigurationImportSelector.class})，这个注解会将AutoConfigurationImportSelector.class类加载到容器中，这个类中的getCandidateConfigurations方法里面通过SpringFactoriesLoader.loadFactoryNames()扫描所有具有`META-INF/spring.factories`的`jar`包（ spring.factories 我们可以理解成 `Spring Boot` 自己的 `SPI` 机制）。 `spring-boot-autoconfigure-x.x.x.x.jar`里就有一个spring.factories文件。`spring.factories`文件由一组一组的`Key = value`的形式，其中一个`key`是EnableAutoConfiguration类的全类名，而它的value是一个以`AutoConfiguration`结尾的类名的列表，有`redis、mq`等这些类名以逗号分隔。
+
+参考：<https://zhuanlan.zhihu.com/p/163685081>
+
+### Spring启动过程
+
+首先实例化SpringApplication对象，在它的构造函数中会对  初始化上下文的各种接口ApplicationContextInitializer和监听器ApplicationListener进行初始化。（是在spring初始化之前完成的，不依赖于spring容器的加载）
+
+
+
+分析 ：<https://www.jianshu.com/p/603d125f21b3>
+
+springboot启动结构图 ：<https://www.processon.com/view/link/59812124e4b0de2518b32b6e>
+
 ### Spring
 
 #### Bean生命周期
@@ -3091,6 +3170,18 @@ ping是基于ICMP协议工作的，参考文章
    ​
 
 ### Redis
+
+#### 持久化
+
+1. RBD。保存数据快照，有三种机制：save，bgsave，自动化。
+
+   save会阻塞当前服务器进程，使得不能处理其他命令。
+
+   bgsave会在后台异步执行快照操作，通过fork()产生子进程，负责持久化。
+
+   自动化触发是在redis.conf中进行配置，比如“save m n”。表示m秒内数据集存在n次修改时，自动触发bgsave。
+
+2. AOF。记录每条变更数据的操作指令，默认是每秒将写操作日志追加到AOF文件中。
 
 #### 淘汰策略
 
