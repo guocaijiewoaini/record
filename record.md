@@ -1,6 +1,18 @@
- -Dvtag=v_lizhi_pushGuide_20200812
+-Dvtag=v_dianbo_modifytopic
 
-力扣待做    1312
+-Dvtag=v_lizhi_pushGuide_20200812
+
+力扣待做    
+
+1312  字符串转回文串的最少插入次数   
+
+72 字符串1转字符串2 的最少操作次数
+
+根据前序和中序复原二叉树
+
+二叉树转双向链表
+
+
 
 
 
@@ -245,7 +257,71 @@ long expireTime = (long) 36 * timeUnit ;
 
 时间类型 int*int超过了int上限，溢出变成负数了，使用long进行接收 ，同时对整型的运算进行强制转换。
 
+### 8.17
 
+1. ~~position  从1开始，有没有限制范围？~~  对
+2. ~~channelId是不是应该为integer类型，数据库中是bitint对应long~~  没关系
+3. ~~模块内容中的   声音==节目吗？~~  对
+4. ~~选中【分类页】时，在右侧出现选择分类下拉框，可选择实际要跳转的所有一级分类（由服务端下发）  返回的内容是分类页的id吗？~~ 对
+5. ~~url存储的时候要进行处理吗？~~
+
+
+接口测试用例
+
+```java
+{
+  "id":"5128885462689122431",
+  "channelId": 20100,
+  "name": "asww",
+  "position": 1,
+  "hasMore": 1,
+  "moreActionType": 86,
+  "moreActionContent": "20100",
+  "contentType": 0,
+  "num": 3,
+  "contentList": [
+    {
+        "id":"5128917805940342911",
+      "position": 2,
+      "targetId": "2822707111228610566",
+      "coverUrl": "http://521110.com"
+    },
+    {
+        "id":"5128917805940343423",
+      "position": 3,
+      "targetId": "2822707111228610566",
+      "coverUrl": "http://5223230.com"
+    },
+    {
+        "id":"5128917805940343935",
+      "position": 4,
+      "targetId": "2822707111228610566",
+      "coverUrl": "http://52444440.com"
+    }
+  ],
+  "status": 0,
+  "showStatus": 0
+}
+```
+
+### 8.20
+
+两个子节点的最近公共父节点
+
+### 8.21
+
+springboot自动装配原理
+
+springboot启动过程
+
+### 8.31
+
+今日shopee面试未答出来的：
+
+1. head和get。
+2. csrf攻击
+3. cpu多级缓存
+4. （群主的问题）spring bean的作用域
 
 ## 面经收集
 
@@ -297,6 +373,14 @@ dns具体讲讲
 
 ## 算法+数据结构
 
+### 二分法模板
+
+<https://leetcode-cn.com/problems/search-insert-position/solution/te-bie-hao-yong-de-er-fen-cha-fa-fa-mo-ban-python-/>
+
+### dijkstra算法
+
+<https://www.zhihu.com/question/20630094/answer/758191548>
+
 ### 杂题
 
 #### 高效判断一个数是否素数
@@ -310,6 +394,56 @@ dns具体讲讲
 可以看到，不在 6 的倍数两侧，即 6x 两侧的数为 6x+2，6x+3，6x+4，由于 2 (3x+1)，3 (2x+1)，2 (3x+2)，所以它们一定不是素数，再除去 6x 本身，显然，素数要出现只可能出现在 6x 的相邻两侧。
 
 所以循环的步长可以设为 6，然后每次只判断 6 两侧的数即可。
+
+```java
+ /**
+     * 判断n是否素数
+     */
+    //解法1 暴力
+    public boolean isPrimeNumber1(int n) {
+        if (n < 2) return false;
+
+        if (n == 2) return true;
+        for (int i = 2; i < n; i++) {
+            if (n % i == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //解法2 sqrt(n)
+    public boolean isPrimeNumber2(int n) {
+        if (n < 2) return false;
+        if (n == 2) return true;
+        int sqrt = (int) Math.sqrt(n);
+        for (int i = 2; i <= sqrt; i++) {
+            if (n % i == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //解法3 找到规律==> 大于等于 5 的素数一定和 6 的倍数相邻。但是和6的倍数相邻的数不一定是素数。因为合数总是可以写成素数的乘积，那么我们直接用n去除以质数就可以达到很好地优化目的。
+    public boolean isPrimeNumber3(int n) {
+        if (n < 5) {
+            return n == 2 || n == 3;
+        }
+        if (n % 6 != 1 && n % 6 != 5) {
+            return false;
+        }
+        int sqrt = (int) Math.sqrt(n);
+        for (int i = 5;i<=sqrt;i++){
+            if(n%i==0||n%(i+2)==0){
+                return false;
+            }
+        }
+        return true;
+    }
+```
+
+
 
 #### IP地址和字符串互转
 
@@ -515,6 +649,8 @@ T[n]=aT[n/b]+f(n)
 
 ### 排序算法
 
+参考：<https://github.com/francistao/LearningNotes/blob/master/Part3/Algorithm/Sort/%E9%9D%A2%E8%AF%95%E4%B8%AD%E7%9A%84%2010%20%E5%A4%A7%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93.md>
+
 稳定排序和不稳定排序：<https://www.cnblogs.com/codingmylife/archive/2012/10/21/2732980.html>
 
 #### 快排
@@ -655,6 +791,37 @@ public void swap(int[] nums,int i, int j){
 ### leetcode
 
 #### [5. 最长回文子串](https://leetcode-cn.com/problems/longest-palindromic-substring/)
+
+i从尾开始好理解一些
+
+```java
+class Solution {
+    public String longestPalindrome(String s) {
+        if(s==null||s.length()==0) return s;
+        char[] chs =s.toCharArray();
+        int n=s.length();
+        boolean[][] dp= new boolean[n][n];
+        int start =0;
+        int end =0;
+        for(int i=n-1;i>=0;i--){
+            for(int j=i;j<n;j++){
+                if(chs[i]==chs[j]&&(j-i<3||dp[i+1][j-1])){
+                    dp[i][j]=true;
+                    if(j-i>end-start){
+                        start=i;
+                        end=j;
+                    }
+                }else{
+                    dp[i][j]=false;
+                }
+            }
+        }
+        return s.substring(start,end+1);
+    }
+}
+```
+
+
 
 ```java
 class Solution {
@@ -855,16 +1022,21 @@ class Solution {
         if(n==1) return nums[0]==target?0:-1;
         int l=0,r=n-1;
         
+        //注意r>=l
         while(l<=r){
             int mid = (l+r)/2;
             if(nums[mid]==target) return mid;
-            if(nums[mid]>=nums[0]){//左边有序 右边无序  然后判断target在不在里面
+            //先找到有序的区间，if条件成立则左边有序
+            if(nums[mid]>=nums[0]){
+                //target在左边区间的话
                 if(nums[0]<=target&&target<nums[mid]){
                     r=mid-1;
                 }else{
                     l=mid+1;
                 }
+                //右边有序
             }else{
+                //在区间内
                 if(nums[mid]<target&&target<=nums[n-1]){
                     l=mid+1;
                 }else{
@@ -1161,6 +1333,48 @@ class Solution {
 }
 ```
 
+#### [59. 螺旋矩阵 II](https://leetcode-cn.com/problems/spiral-matrix-ii/)
+
+和54题做法类似。
+
+```java
+class Solution {
+    public int[][] generateMatrix(int n) {
+        int[][] res =new int[n][n];
+        if(n==0) return res;
+        int left =0;int right = n-1;int bottom =0;int top =n-1;
+        int cur =1;
+        while(cur<=n*n){
+            //向右
+            for(int i=left;i<=right;i++){
+                res[bottom][i]=cur++;
+            }
+            //向下
+            for(int i=bottom+1;i<=top;i++){
+                res[i][right]=cur++;
+            }
+            if(bottom<top){
+                for(int i=right-1;i>=left;i--){
+                    res[top][i]=cur++;
+                }
+            }
+            if(right>left){
+                for(int i=top-1;i>bottom;i--){
+                    res[i][left]=cur++;
+                }
+            }
+            left++;
+            bottom++;
+            right--;
+            top--;
+        }
+        return res;
+    }
+}
+```
+
+
+
 #### 64 最小路径和
 
 简单dp，代码如下。
@@ -1184,6 +1398,30 @@ class Solution {
     }
 }
 ```
+
+#### [69. x 的平方根](https://leetcode-cn.com/problems/sqrtx/)
+
+1.二分法  2.牛顿迭代法
+
+```java
+class Solution {
+    // f(x)=x*x-a
+    // f(x) =f(x0)+(x-x0)f'(x)
+    //f(x)=0
+    //x=-f(x0)/f'(x)+x0
+    //x=x0代入
+    //x=(-1/2)*(x0-a/x0)+x0 =(1/2)*(x0+a/x0)
+    public int mySqrt(int x) {
+        long res =x ;
+        while(res*res>x){
+            res=(res+x/res)>>1;
+        }
+        return (int)res;
+    }
+}
+```
+
+
 
 #### [92. 反转链表 II](https://leetcode-cn.com/problems/reverse-linked-list-ii/)
 
@@ -1433,6 +1671,95 @@ class Solution {
     }
 ```
 
+#### [118. 杨辉三角](https://leetcode-cn.com/problems/pascals-triangle/)
+
+杨辉三角的生成，找规律题。
+
+```java
+class Solution {
+    public List<List<Integer>> generate(int numRows) {
+        List<List<Integer>> res =new ArrayList<>();
+        List<Integer> sub =new ArrayList<>();
+        for(int i=0;i<numRows;i++){
+            for(int j=0;j<=i;j++){
+                if(j==0||j==i){
+                    sub.add(1);
+                }else{
+                    sub.add(res.get(i-1).get(j-1)+res.get(i-1).get(j));
+                }
+            }
+            res.add(new ArrayList<>(sub));
+            sub=new ArrayList<>();
+        }
+        return res;
+    }
+}
+```
+
+#### [119. 杨辉三角 II](https://leetcode-cn.com/problems/pascals-triangle-ii/)
+
+```java
+class Solution {
+    public List<Integer> getRow(int rowIndex) {
+        List<Integer> list =new ArrayList<>();
+        for(int i=0;i<=rowIndex;i++){
+            list.add(1);
+            //由于循环中计算list中j的值用到了list的j-1的值，
+            //所以应该从后往前遍历
+            //第一个元素和最后一个元素固定为1不动，修改其他位置元素
+            for(int j=list.size()-2;j>0;j--){
+                list.set(j,list.get(j)+list.get(j-1));
+            }
+        }
+        return list;
+    }
+}
+```
+
+#### [123. 买卖股票的最佳时机 III](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iii/)
+
+这道题很多题解都是复杂的动态规划（理解困难），实际上遍历两遍数组就可以，本质上是把prices数组拆分成两个，第一次交易再前半部分，第二次交易在后半部分。
+
+参考：<https://www.bilibili.com/video/BV1ED4y1Q7AP>
+
+```java
+class Solution {
+    public int maxProfit(int[] prices) {
+        //由于只能买卖两次，因此两次遍历prices数组
+        //一次从头到尾Ldp，一次从尾到头Rdp
+        //找到Ldp[i]+Rdp[i]的最大值
+        int n =prices.length;
+        if(prices==null||n<2){return 0;}
+        //从左往右
+        int[] Ldp =new int[n];
+        int min =prices[0];Ldp[0]=0;
+        for(int i=1;i<n;i++){
+            if(min>prices[i]){
+                min=prices[i];
+            }
+            Ldp[i]=Math.max(prices[i]-min,Ldp[i-1]);
+        }
+
+        int[] Rdp =new int[n];
+        int max =prices[n-1];
+        Rdp[n-1]=0;
+        for(int j=n-2;j>=0;j--){
+            if(prices[j]>max){
+                max=prices[j];
+            }
+            Rdp[j]=Math.max(max-prices[j],Rdp[j+1]);
+        }
+        int res = 0;
+        for(int k=0;k<n;k++){
+            res =Math.max(res,Rdp[k]+Ldp[k]);
+        }
+        return res;
+    }
+}
+```
+
+
+
 #### [143. 重排链表](https://leetcode-cn.com/problems/reorder-list/)
 
 先找到中间节点，然后反转后半部分链表，然后合并反转后的后半部分和前半部分
@@ -1638,7 +1965,32 @@ class Solution {
 递归，空返回0；左树空&&右树空返回n；有一个不为空继续往下加和。
 
 ```java
-
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public int sumNumbers(TreeNode root) {
+        return sumNumbersHelper(root,0);
+    }
+    public int  sumNumbersHelper(TreeNode root,int val){
+        if(root==null) {
+            return 0;
+        }
+        val = 10*val+root.val;
+        if(root.left==null&&root.right==null){
+            return val;
+        }
+        int left = sumNumbersHelper(root.left,val);
+        int right = sumNumbersHelper(root.right,val);
+        return left+right;
+    }
+}
 ```
 
 
@@ -1992,6 +2344,34 @@ class Solution {
 }
 ```
 
+
+
+#### [309. 最佳买卖股票时机含冷冻期](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
+
+三种状态的转换，动态规划。
+
+参考：<https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/solution/yi-tu-miao-dong-jie-fa-by-zi-gei-zi-zu/>
+
+```java
+class Solution {
+    public int maxProfit(int[] prices) {
+        int n =prices.length;
+        if(n<2) return 0;
+        int[][] dp =new int[n][3];
+        //0-持有   1-不持有 冷冻期不可买  2-不持有 可买
+        dp[0][0]=-prices[0];
+        for(int i=1;i<n;i++){
+            dp[i][0] =Math.max(dp[i-1][0],dp[i-1][2]-prices[i]);
+            dp[i][1] =dp[i-1][0]+prices[i];
+            dp[i][2] =Math.max(dp[i-1][1],dp[i-1][2]);
+        }
+        return Math.max(dp[n-1][1],dp[n-1][2]);
+    }
+}
+```
+
+
+
 #### [322. 零钱兑换](https://leetcode-cn.com/problems/coin-change/)
 
 自顶向下---dfs，自底向上--动态规划。dp[0]=0很巧妙，这样当i=coins[j]时，dp[i-coin]+1=1表示使用coin一次。
@@ -2143,8 +2523,8 @@ class Solution {
         if(n==0) return 0;
         char[] a =s.toCharArray();
         int[][] dp =new int[n][n];
-        for(int i=0;i<n;i++) dp[i][i]=1;
         for(int i=n-1;i>=0;i--){
+            dp[i][i]=1;
             for(int j=i+1;j<n;j++){
                 if(a[i]==a[j]){
                     dp[i][j]=dp[i+1][j-1]+2;
@@ -2219,6 +2599,98 @@ class Solution {
 }
 ```
 
+#### [679. 24 点游戏](https://leetcode-cn.com/problems/24-game/)
+
+```java
+class Solution {
+    static final int TARGET = 24;
+    static final double EPSILON = 1e-6;
+    static final int ADD = 0, MULTIPLY = 1, SUBTRACT = 2, DIVIDE = 3;
+    public boolean judgePoint24(int[] nums) {
+        List<Double> list =new ArrayList<>();
+        for(int num:nums){
+            list.add((double)num);
+        }
+        return solve(list);
+
+    }
+
+    public boolean solve(List<Double> list){
+        int size =list.size();
+        if(list.size()==0) return false;
+        if(list.size()==1) return Math.abs(list.get(0)-TARGET)<EPSILON;
+        for(int i=0;i<size;i++){
+            for(int j=0;j<size;j++){
+                
+                if(i!=j){
+                    List<Double> list2 =new ArrayList<>();
+                    for(int k=0;k<size;k++){
+                        if(k!=i&&k!=j) list2.add(list.get(k));
+                    }
+                    for(int k=0;k<4;k++){
+                        if(k<2&&i>j) {continue;}
+                        if(k==ADD){//加
+                            list2.add(list.get(i)+list.get(j));
+                        }
+                        else if(k==MULTIPLY){//乘
+                            list2.add(list.get(i)*list.get(j));
+                        }
+                        else if(k==SUBTRACT){//减
+                            list2.add(list.get(i)-list.get(j));
+                        }
+                        else if(k==DIVIDE){//除
+                            if(Math.abs(list.get(j))<EPSILON) continue;
+                            else list2.add(list.get(i)/list.get(j));
+                        }
+                        if(solve(list2)){
+                            return true;
+                        }
+                        list2.remove(list2.size()-1);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+}
+```
+
+
+
+#### [885. 螺旋矩阵 III](https://leetcode-cn.com/problems/spiral-matrix-iii/)
+
+```java
+class Solution {
+    public int[][] spiralMatrixIII(int R, int C, int r0, int c0) {
+        int[][] steps =new int[][]{
+            {0,1},{1,0},{0,-1},{-1,0}
+            };
+        int n =0;//方向 0-向右 1-向下 2-向左 3-向上
+        int m =0;//当次应走的步数
+        int[][] res =new int[R*C][2];
+        res[0][0]=r0;
+        res[0][1]=c0;
+        int index = 1;
+        while(index<R*C){
+            for(int i=0;i<=m;i++){
+                r0+=steps[n][0];
+                c0+=steps[n][1];
+                if(r0>=0&&r0<R&&c0>=0&&c0<C){
+                    res[index][0]=r0;
+                    res[index][1]=c0;
+                    index++;
+                }
+                if(index==R*C) return res;
+            }
+            //这两行是算法的关键之处
+            m+=(n%2);//每两次的step相等，即n增加2对应m增加1
+            n=(n+1)%4;// n=0 ->n=1 ->n=2->n=3 ->n=0.....方向的循环变化
+        }
+        return res;
+    }
+}
+```
+
 
 
 #### [919. 完全二叉树插入器](https://leetcode-cn.com/problems/complete-binary-tree-inserter/)
@@ -2277,6 +2749,48 @@ class CBTInserter {
  * TreeNode param_2 = obj.get_root();
  */
 ```
+
+#### [1226. 哲学家进餐](https://leetcode-cn.com/problems/the-dining-philosophers/)
+
+这个题考察的是如何避免死锁。
+
+死锁的四个必要条件：
+
+1.互斥。同一时间资源只能被一个进程使用。
+
+2.请求和保持。进程至少保持了一个资源，但又提出新的资源请求，而该资源被别的线程占用，此时请求的线程被阻塞，但对自己获得的资源保持不变。
+
+3.循环等待。多个进程之间形成了首尾相接循环等待的资源关系。
+
+4.不可剥夺。资源只能被获得该资源的进程主动释放，不可被强行剥夺。
+
+#### [1312. 让字符串成为回文串的最少插入次数](https://leetcode-cn.com/problems/minimum-insertion-steps-to-make-a-string-palindrome/)
+
+新瓶装旧酒，本质上就是最长回文子序列516题。
+
+```java
+class Solution {
+    //求最长的回文子序列len，用n-len 即可得到最少插入次数
+    public int minInsertions(String s) {
+        char[] chs =s.toCharArray();
+        int n =s.length();
+        int[][] dp =new int[n][n];
+        for(int i=n-1;i>=0;i--){
+            dp[i][i]=1;
+            for(int j=i+1;j<n;j++){
+                if(chs[i]==chs[j]){
+                    dp[i][j]=dp[i+1][j-1]+2;
+                }else{
+                    dp[i][j]=Math.max(dp[i+1][j],dp[i][j-1]);
+                }
+            }
+        }
+        return n-dp[0][n-1];
+    }
+}
+```
+
+
 
 ### 剑指Offer
 
@@ -2404,6 +2918,49 @@ class Solution {
 }
 ```
 
+
+
+#### [剑指 Offer 68 - I. 二叉搜索树的最近公共祖先](https://leetcode-cn.com/problems/er-cha-sou-suo-shu-de-zui-jin-gong-gong-zu-xian-lcof/)
+
+```java
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        TreeNode l =p.val>q.val?q:p;
+        TreeNode r =p.val>q.val?p:q;
+        TreeNode t= root;
+        while(t!=null){
+            if(t.val>r.val){
+                t=t.left;
+            }else if(t.val<l.val){
+                t=t.right;
+            }else{
+                return t;
+            }
+        }
+        return null;
+    }
+}
+```
+
+
+
+#### [剑指 Offer 68 - II. 二叉树的最近公共祖先](https://leetcode-cn.com/problems/er-cha-shu-de-zui-jin-gong-gong-zu-xian-lcof/)
+
+```java
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if(root==null||root==q||root==p) return root;
+        TreeNode l =lowestCommonAncestor(root.left,p,q);
+        TreeNode r =lowestCommonAncestor(root.right,p,q);
+        if(l==null) return r;
+        if(r==null) return l;
+        return root;
+    }
+}
+```
+
+
+
 ## 设计模式
 
 六大原则
@@ -2415,6 +2972,17 @@ class Solution {
 
 
 ## Java基础
+
+### 注解
+
+java的元注解一共有四个：
+
+1. @Document
+2. @Target
+3. @Retention
+4. @Inherited
+
+
 
 ### 深拷贝和浅拷贝
 
@@ -2994,6 +3562,46 @@ ls -l | grep '.*\.jpg' | wc -l
 
 ## 计算机网络
 
+### TCP可靠性保证
+
+1. 检验和。计算内容包括TCP首部及数据部分。计算方法为：在发送方将整个报文段分为多个16位的段，然后将所有段进行反码相加，将结果存放在检验和字段中，接收方用相同的方法进行计算，如最终结果为检验字段所有位是全1则正确（UDP中为0是正确），否则存在错误。
+
+2. 序列号和确认应答。TCP传输时将每个字节的数据都进行编号，接收方收到后会对传输方进行确认应答。
+
+3. 超时重传。
+
+4. 流量控制。
+
+5. 拥塞控制。慢启动，拥塞避免；快重传，快恢复。
+
+   **慢启动、拥塞避免：**刚开始时，发送方不知道网络的承载能力，如果一开始就发送大量数据，容易造成网络拥堵和丢包问题。刚开始时定义发送窗口为1，向网络中发送数据包，每次发送数据前，与接收方的反馈窗口大小进行比较，取最小值作为实际发送的窗口。执行慢启动算法，发送窗口呈指数增长，达到门限值ssthresh时执行拥塞避免算法，发送窗口线性增长。
+
+   当出现网络拥塞的时候，把门限值ssthresh降为当前发送窗口的一半。
+
+   **快重传、快恢复：**快速重传要求接收方在收到一个失序报文后立即发出重复确认，（为的是使发送方提早知道有报文段没有达到对方），而不要等自己发送数据的时候捎带确认。规定：发送方连续收到3个重复确认就应当立即重传对方未收到的报文段，不必等到超时重传计数器时间到期。快恢复，在网络发生拥塞时，执行乘法减小，把慢开始门限减半，执行拥塞避免算法，使拥塞窗口缓慢增大。
+
+参考：<https://www.jianshu.com/p/42dbcd39c3e7>
+
+
+
+### HTTP状态码
+
+200 请求成功，并且返回结果
+
+301 永久重定向。客户端保存新的链接并且向新的链接发出请求，返回结果。
+
+302 临时重定向。	资源临时移动，客户端使用原有的uri。
+
+400 客户端请求语法错误。
+
+404 请求失败，找不到资源。
+
+500 服务器错误。
+
+502 Bad Gateway充当网关或代理的服务器，从远端服务器接收到了一个无效的请求
+
+503 服务器过载或者维护，无法解决当前的请求。
+
 ### HTTPS
 
 **优缺点**
@@ -3109,6 +3717,7 @@ ping是基于ICMP协议工作的，参考文章
 
 ## 中间件和框架
 
+<<<<<<< HEAD
 ### SpringBoot自动装配
 
 SpringBoot启动类上的注解@SpringBootApplication，这个注解包含了@SpringBootConfiguration和@ComponentScan和@EnableAutoConfiguration三个注解。自动装配的核心在于注解@EnableAutoConfiguration，它包含关键注解@Import({AutoConfigurationImportSelector.class})，这个注解会将AutoConfigurationImportSelector.class类加载到容器中，这个类中的getCandidateConfigurations方法里面通过SpringFactoriesLoader.loadFactoryNames()扫描所有具有`META-INF/spring.factories`的`jar`包（ spring.factories 我们可以理解成 `Spring Boot` 自己的 `SPI` 机制）。 `spring-boot-autoconfigure-x.x.x.x.jar`里就有一个spring.factories文件。`spring.factories`文件由一组一组的`Key = value`的形式，其中一个`key`是EnableAutoConfiguration类的全类名，而它的value是一个以`AutoConfiguration`结尾的类名的列表，有`redis、mq`等这些类名以逗号分隔。
@@ -3124,6 +3733,11 @@ SpringBoot启动类上的注解@SpringBootApplication，这个注解包含了@Sp
 分析 ：<https://www.jianshu.com/p/603d125f21b3>
 
 springboot启动结构图 ：<https://www.processon.com/view/link/59812124e4b0de2518b32b6e>
+=======
+### SpringBoot
+
+
+>>>>>>> 08b2779e424bf3cea8b620350127f757559d1d39
 
 ### Spring
 
@@ -3170,6 +3784,10 @@ springboot启动结构图 ：<https://www.processon.com/view/link/59812124e4b0de
    ​
 
 ### Redis
+
+#### 三种集群模式和主从同步
+
+<https://www.cnblogs.com/51life/p/10233340.html>
 
 #### 持久化
 
@@ -3286,7 +3904,7 @@ Zab协议分为三部分：
 
     - 1. 各个节点变为Looking状态
 
-         Leader宕机后，各个Follower节点状态变更为Looking，参与Leader选举过程。Observer不参与。
+        Leader宕机后，各个Follower节点状态变更为Looking，参与Leader选举过程。Observer不参与。
 
       2. 各个Server节点发起投票
 
@@ -3301,3 +3919,7 @@ Zab协议分为三部分：
    - 数据同步
 
      崩溃恢复完成选举以后，接下来的工作就是数据同步，在选举过程中，通过投票已经确认 Leader 节点是最大 Zxid 的节点，同步阶段就是利用 Leader 前一阶段获得的最新 Proposal 历史同步集群中所有的副本。
+
+### 项目
+
+断点续传 https://github.com/niumoo/down-bit
